@@ -17,6 +17,13 @@ export function erstelleSpieler(szene, welt) {
     pos,
     tempo,
     winken() { starteWinken(anim); ton.winken(); },
+    // Versetzt die Figur (Etagenwechsel); dreh = Blickrichtung (0 = zur Kamera)
+    teleport(x, z, dreh = 0) {
+      pos.set(x, 0, z);
+      tempo.set(0, 0, 0);
+      blickwinkel = dreh;
+      figur.wurzel.rotation.y = dreh;
+    },
     // richtung: {x, z} mit Länge 0..1, aktiv: false im Menü (Figur steht und atmet nur)
     update(dt, richtung, aktiv = true) {
       const max = SPIELER.tempo, rx = aktiv ? richtung.x : 0, rz = aktiv ? richtung.z : 0;

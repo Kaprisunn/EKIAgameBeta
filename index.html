@@ -57,7 +57,14 @@ body {
   background: #fff3f0; color: #7a1d10; border: 3px solid #d9483b; font: 600 18px/1.35 var(--schrift); display: grid; gap: 10px;
   max-height: 50vh; overflow: auto; user-select: text; -webkit-user-select: text; }
 #fehler pre { margin: 0; white-space: pre-wrap; font-size: 15px; }
-@media (prefers-reduced-motion: reduce) { .joy-basis { transition: none; } }
+#blende { position: fixed; inset: 0; z-index: 5; background: var(--nebel); opacity: 0; pointer-events: none; transition: opacity .26s; }
+#blende.an { opacity: 1; }
+#etage { position: fixed; left: calc(16px + var(--rand-l)); top: calc(16px + var(--rand-o)); padding: 10px 18px; border-radius: 22px;
+  background: var(--blau); color: var(--weiss); box-shadow: 0 5px 0 var(--blau-tief); pointer-events: none; }
+#aktionText { position: fixed; right: calc(28px + var(--rand-r)); bottom: calc(138px + var(--rand-u)); width: 96px; padding: 4px 0;
+  border-radius: 14px; background: rgba(255, 255, 255, .92); color: var(--blau-tief); text-align: center; pointer-events: none; }
+.knopf-hell { background: var(--weiss); border: 3px solid var(--blau); font-size: 18px; }
+@media (prefers-reduced-motion: reduce) { .joy-basis, #blende { transition: none; } }
 </style>
 </head>
 <body>
@@ -66,11 +73,13 @@ body {
 <div id="joyzone" hidden><div class="joy-basis"><div class="joy-knopf"></div></div></div>
 <button id="aktion" class="rund" type="button" aria-label="Winken" hidden>👋</button>
 <button id="pauseKnopf" class="rund" type="button" aria-label="Pause" hidden>❚❚</button>
+<div id="aktionText" hidden></div>
+<div id="etage" hidden></div>
 <div id="toast" hidden></div>
 <div id="hoch"><span>Tipp: iPad quer halten für mehr Überblick</span></div>
 <section id="menue" class="tafel">
   <h1>EKIA<small>Kaiserslautern</small></h1>
-  <p>Deine erste Schicht beginnt. Schau dich in der Halle um!</p>
+  <p>Deine erste Schicht beginnt. Erkunde Erdgeschoss und Obergeschoss!</p>
   <button id="startKnopf" class="knopf" type="button" disabled>Halle wird aufgebaut …</button>
   <p class="klein">Links ziehen: laufen · 👋: winken<br>Tastatur: WASD oder Pfeile, Leertaste, P</p>
 </section>
@@ -78,7 +87,9 @@ body {
   <h1>Pause</h1>
   <p>Kurz durchatmen. Die Halle wartet.</p>
   <button id="weiterKnopf" class="knopf" type="button">Weiter</button>
+  <button id="rolleKnopf" class="knopf knopf-hell" type="button">Rolle: Verkauf (zum Testen tippen)</button>
 </section>
+<div id="blende"></div>
 <div id="fehler" hidden></div>
 <script>
 // Fängt jeden Fehler ab und zeigt ihn im Spiel statt eines leeren Bildschirms.

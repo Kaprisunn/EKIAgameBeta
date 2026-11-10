@@ -1,27 +1,31 @@
 # Stand: EKIA Kaiserslautern
 
 **Spiel-Link:** https://claude.ai/artifact/RHUECknAuqPv52VwFmCeHA
-**Letzter Meilenstein:** M1 Grundgerüst (fertig) · **Nächster:** M2 „Halle lebt“ (siehe PLAN.md)
+**Letzter Meilenstein:** M2 Etagen-System & Erdgeschoss (fertig) · **Nächster:** M3 Obergeschoss vollständig (PLAN.md)
 
 ## Was funktioniert
-- Menü → Spiel → Pause (Knopf oben rechts, Taste P/Esc, Tab-Wechsel pausiert automatisch).
-- Diorama-Halle 44 × 32: Fliesenboden, Wände mit blauem Band, Birkenholz-Platte, Pfälzerwald dahinter, Nebel, Himmelsverlauf.
-- Requisiten: 3 Palettenregale, 4 Paletten, 2 Wohnkojen, Fundgrube, Restaurant (6 Tischgruppen, Theke), 3 Kassen, 2 SB-Kassen, Kundenservice, 2 Aktionsinseln, 10 Pflanzen, gelbe Pfeile.
-- Hauptfigur aus dem Figuren-Baukasten (Steckbrief in src/daten.js) mit Umriss, Augen, Blinzeln, Atmen, Umherschauen, Laufen, Winken.
-- Steuerung: Joystick links (erscheint unter dem Finger), Wink-Knopf rechts; Tastatur WASD/Pfeile, Leertaste/E, Enter, P.
-- Kollision mit Wänden und Möbeln, Kamera folgt weich und schaut voraus.
-- Töne (synthetisch): Klick, Schritte, Winken; Ton startet beim ersten Tippen.
-- Fehler werden im Spiel angezeigt; window.__info liefert Draw Calls und Dreiecke.
-- Leistung im Test: 35 Draw Calls, ca. 43.000 Dreiecke (Budget 150 / 100.000). Pixelverhältnis sinkt automatisch bei unter 45 Bildern/s.
+- Menü → Spiel → Pause (Knopf oben rechts, P/Esc, Tab-Wechsel pausiert). Etagen-Anzeige oben links.
+- Zwei Etagen (52 × 36), nur die aktive ist sichtbar. Treppe: hineinlaufen wechselt automatisch.
+  Aufzug: davor stellen, rechter Knopf zeigt ⬆️/⬇️ „Aufzug“. Kurze Überblendung, „Ding“-Ton.
+- EG: Eingang/Ausgang, Markthalle (6 Regale, 2 Wühltische), SB-Halle (5 Hochregale, Gang 1–5), 3 Kassen,
+  2 SB-Kassen, Hotdog-Stand mit Stehtischen, Fundgrube, Logistik hinter gelb-schwarzem Zaun mit Schranke,
+  Stapler, Rollwagen, Wareneingang. Schranke öffnet nur für Rolle Logistik (sonst Hinweis); hinaus geht immer.
+- OG (Vorstufe): Wohnzimmer- und Schlafzimmer-Koje, Restaurant mit 6 Tischgruppen und Theke, Holzdielen,
+  blauer Gebäudesockel, Außenwelt liegt tiefer.
+- Schilder mit Text (Atlas), u. a. „EKIA Kaiserslautern“ und „Willkommen in Kaiserslautern“.
+- Rolle Verkauf/Logistik per Testknopf im Pausenmenü (gespeichert), bis der Editor (M5) kommt.
+- Figur, Animationen, Joystick, Tastatur, Töne, Fehleranzeige wie in M1.
+- Leistung im Test: EG 36 Draw Calls / 46.178 Dreiecke, OG 31 / ca. 38.000 (Budget 150 / 100.000).
 
 ## Technik-Notizen
-- Jede Figurengruppe ist EIN Mesh mit Vertex-Farben (ein gemeinsames Toon-Material) plus Umriss-Hülle: spart viele Draw Calls.
-- PCFSoftShadowMap gibt es in three r186 nicht mehr: PCFShadowMap mit shadow.radius = 3 für weiche Schatten.
-- Dateien: main, zustand, eingabe, kamera, welt, requisiten, formen, figuren, animation, spieler, ui, audio, daten.
+- Grundriss nur in src/karte.js ändern (Möbel, Schilder, Punkte, Pfeile). Neue Möbeltypen in moebel.js / moebel-og.js.
+- etage.js verschmilzt Einzelstücke zu 1 Mesh, häufige Möbel (ab 3) werden InstancedMesh; Kollision aus `fuss`.
+- interaktion.js: Punkte mit art/x/z/r; treppe und schranke lösen automatisch aus, der Rest per Aktionsknopf.
+- window.__test.etage(id, x, z) versetzt die Figur (für Tests und Fehlersuche).
 
 ## Was fehlt
-- Alles ab M2: Säulen, Tempo-Bonus auf dem Pfeilweg, Minispiele, Währungen, Kund:innen, Pausenraum, Parkplatz.
-- Leistung auf dem echten iPad noch ungeprüft.
+- M3: Umkleide, Großraumbüro, weitere Kojen. Danach Figur 2.0, Editor, Missionen, Kund:innen (PLAN.md).
+- Leistung auf dem echten iPad ungeprüft.
 
 ## Bekannte Fehler
-- Keine bekannt. Im Hochformat erscheint nur ein Hinweis, die Kamera zoomt etwas heraus.
+- Keine bekannt. Im Hochformat nur Hinweis und etwas weitere Kamera.
