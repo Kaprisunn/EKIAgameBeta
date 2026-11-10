@@ -1,11 +1,13 @@
-// Einstieg: Renderer, Szene, Spielschleife mit Zuständen, Leistungsanpassung, Fehleranzeige.
+// Einstieg: Renderer, Szene, Spielschleife mit Zuständen, Etagenwechsel, Leistungsanpassung, Fehleranzeige.
 import * as THREE from 'three';
 import { erstelleWelt } from './welt.js';
 import { erstelleSpieler } from './spieler.js';
 import { erstelleKamera } from './kamera.js';
 import { erstelleEingabe } from './eingabe.js';
 import { erstelleUI } from './ui.js';
-import { erstelleZustand, Z } from './zustand.js';
+import { erstelleInteraktion } from './interaktion.js';
+import { erstelleZustand, Z, speicher } from './zustand.js';
+import { ton } from './audio.js';
 
 const zeigeFehler = window.__zeigeFehler || ((e) => console.error(e));
 
@@ -27,7 +29,30 @@ function starte() {
   const kam = erstelleKamera();
   const zustand = erstelleZustand();
   let neuZeichnen = true;
+  // Rolle bis zum Charakter-Editor (M5) per Testknopf im Pausenmenü umschaltbar
+  let rolle = speicher.laden('rolle', 'verkauf');
 
+  // Etagenwechsel mit kurzer Überblendung; die Figur landet am Ankunftspunkt der Ziel-Etage
+  function wechsleEtage(p) {
+    ui.blende(() => {
+      welt.zeige(p.ziel);
+      const [x, z, dreh] = p.ankunft;
+      spieler.teleport(x, z, dreh);
+      kam.folge(spieler.pos, spieler.tempo, 0, true);
+      welt.folgeSonne(spieler.pos);
+      ui.etage(welt.etage.def, rolle);
+    });
+  }
+  const interaktion = erstelleInteraktion({
+    treppe: wechsleEtage,
+    aufzug: (p) => { ton.ding(); wechsleEtage(p); },
+    schranke: () => { if (rolle !== 'logistik') ui.toast('Nur für Logistik. Als Verkäufer:in hast du hier keinen Zutritt.'); },
+  });
+
+  const aktion = () => {
+    if (zustand.get() !== Z.SPIEL) return;
+    if (interaktion.nah) interaktion.ausloesen(); else spieler.winken();
+  };
   const umschaltenPause = () => {
     if (zustand.get() === Z.SPIEL) zustand.setze(Z.PAUSE);
     else if (zustand.get() === Z.PAUSE) zustand.setze(Z.SPIEL);
@@ -36,15 +61,21 @@ function starte() {
     start: () => zustand.setze(Z.SPIEL),
     weiter: () => zustand.setze(Z.SPIEL),
     pause: umschaltenPause,
-    aktion: () => { if (zustand.get() === Z.SPIEL) spieler.winken(); },
+    aktion,
+    rolle: () => {
+      rolle = rolle === 'logistik' ? 'verkauf' : 'logistik';
+      speicher.speichern('rolle', rolle);
+      ui.etage(welt.etage.def, rolle);
+    },
   });
   const eingabe = erstelleEingabe({
-    aktion: () => { if (zustand.get() === Z.SPIEL) spieler.winken(); },
+    aktion,
     pause: umschaltenPause,
     start: () => { if (zustand.get() !== Z.SPIEL) zustand.setze(Z.SPIEL); },
   });
   zustand.beiWechsel((neu) => { ui.zeige(neu); eingabe.zuruecksetzen(); neuZeichnen = true; });
   ui.zeige(Z.MENUE);
+  ui.etage(welt.etage.def, rolle);
   document.addEventListener('visibilitychange', () => { if (document.hidden && zustand.get() === Z.SPIEL) zustand.setze(Z.PAUSE); });
 
   function groesse() {
@@ -58,7 +89,9 @@ function starte() {
   groesse();
   kam.folge(spieler.pos, spieler.tempo, 0, true);
 
-  const info = (window.__info = { drawCalls: 0, dreiecke: 0, pixelRatio: stufen[0], zustand: Z.MENUE });
+  const info = (window.__info = { drawCalls: 0, dreiecke: 0, pixelRatio: stufen[0], zustand: Z.MENUE, etage: welt.etage.id });
+  // Testhilfe für tools/check.mjs und Fehlersuche: Etage wechseln, Figur versetzen
+  window.__test = { etage: (id, x = -14, z = 14.5) => { welt.zeige(id); spieler.teleport(x, z); ui.etage(welt.etage.def, rolle); } };
   let letzte = performance.now(), messZeit = 0, messBilder = 0;
 
   renderer.setAnimationLoop((jetzt) => {
@@ -68,11 +101,14 @@ function starte() {
       const dt = Math.min(echt, 0.05);
       const z = zustand.get();
       info.zustand = z;
+      info.etage = welt.etage.id;
       if (z === Z.PAUSE && !neuZeichnen) return;
       neuZeichnen = false;
 
       if (z !== Z.PAUSE) {
         spieler.update(dt, eingabe.richtung(), z === Z.SPIEL);
+        welt.update(dt, spieler.pos, rolle);
+        if (z === Z.SPIEL) ui.aktion(interaktion.update(welt.etage.punkte, spieler.pos));
         kam.folge(spieler.pos, spieler.tempo, dt);
         welt.folgeSonne(spieler.pos);
       }

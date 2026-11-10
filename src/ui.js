@@ -1,21 +1,22 @@
-// HTML-Oberfläche über dem Spiel: Menü, Pause, Knöpfe, kurze Hinweise.
+// HTML-Oberfläche über dem Spiel: Menü, Pause, Knöpfe, Etagen-Anzeige, Überblendung, kurze Hinweise.
 import { Z, speicher } from './zustand.js';
 import { ton } from './audio.js';
 
 const $ = (id) => document.getElementById(id);
 
-export function erstelleUI({ start, weiter, pause, aktion }) {
+export function erstelleUI({ start, weiter, pause, aktion, rolle }) {
   const el = {
-    menue: $('menue'), pause: $('pause'), joy: $('joyzone'), aktion: $('aktion'),
-    pauseKnopf: $('pauseKnopf'), start: $('startKnopf'), toast: $('toast'),
+    menue: $('menue'), pause: $('pause'), joy: $('joyzone'), aktion: $('aktion'), aktionText: $('aktionText'),
+    pauseKnopf: $('pauseKnopf'), start: $('startKnopf'), toast: $('toast'), blende: $('blende'), etage: $('etage'), rolle: $('rolleKnopf'),
   };
   const tippen = (knopf, f) => knopf.addEventListener('pointerdown', (e) => { e.preventDefault(); e.stopPropagation(); f(); });
   tippen(el.start, () => { if (!el.start.disabled) { ton.klick(); start(); } });
   tippen($('weiterKnopf'), () => { ton.klick(); weiter(); });
   tippen(el.pauseKnopf, () => { ton.klick(); pause(); });
+  tippen(el.rolle, () => { ton.klick(); rolle(); });
   tippen(el.aktion, aktion);
 
-  let toastUhr = 0;
+  let toastUhr = 0, aktionArt = null;
   function toast(text, ms = 3200) {
     el.toast.textContent = text;
     el.toast.hidden = false;
@@ -30,11 +31,33 @@ export function erstelleUI({ start, weiter, pause, aktion }) {
       const spiel = zustand === Z.SPIEL;
       el.menue.hidden = zustand !== Z.MENUE;
       el.pause.hidden = zustand !== Z.PAUSE;
+      el.etage.hidden = zustand === Z.MENUE;
       el.joy.hidden = el.aktion.hidden = el.pauseKnopf.hidden = !spiel;
+      el.aktionText.hidden = !spiel || !el.aktionText.textContent;
       if (spiel && !speicher.laden('steuerungGesehen', false)) {
         toast('Zieh links mit dem Finger, um zu laufen. 👋 rechts zum Winken.', 5000);
         speicher.speichern('steuerungGesehen', true);
       }
+    },
+    etage(def, r) {
+      el.etage.textContent = `${def.kurz} · ${def.name}`;
+      el.rolle.textContent = `Rolle: ${r === 'logistik' ? 'Logistik' : 'Verkauf'} (zum Testen tippen)`;
+    },
+    // Aktionsknopf zeigt, was in der Nähe möglich ist (sonst Winken)
+    aktion(p) {
+      const art = p ? p.art + (p.ziel ?? '') : '';
+      if (art === aktionArt) return;
+      aktionArt = art;
+      const [symbol, text] = !p ? ['👋', ''] : p.art === 'aufzug' ? [p.ziel === 'og' ? '⬆️' : '⬇️', 'Aufzug'] : ['❗', ''];
+      el.aktion.textContent = symbol;
+      el.aktion.setAttribute('aria-label', text || 'Winken');
+      el.aktionText.textContent = text;
+      el.aktionText.hidden = !text;
+    },
+    // Kurze Überblendung: abdunkeln, fn ausführen, wieder aufblenden
+    blende(fn) {
+      el.blende.classList.add('an');
+      setTimeout(() => { try { fn(); } finally { el.blende.classList.remove('an'); } }, 280);
     },
   };
 }

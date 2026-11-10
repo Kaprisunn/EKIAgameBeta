@@ -133,3 +133,33 @@ Diorama-Halle 44 × 32 Einheiten, die Kamera schaut von Süden schräg hinein. D
 - Mitte hinten: Wohnkojen (Verkauf). Osten: Restaurant. Nordosten: Fundgrube.
 - Süden: Kassen, Kundenservice, Ausgang. Büro und Pausenraum hinter einer Tür in der Westwand.
 - Der gelbe Pfeilweg führt als Rundweg durch alle Bereiche.
+
+---
+
+## 7. TEIL 2: AUSBAU (Anforderungen vom November 2026, ersetzt 6.8)
+Ein Lern- und Trainingsspiel für Mitarbeiter:innen. Das Haus heißt **EKIA Kaiserslautern**.
+
+### 7.1 Spielwelt (Mini-Open-World)
+- Zwei Etagen. **Erdgeschoss:** Markthalle, SB-Halle, Hotdog-Stand, Kassen, Fundgrube. **Obergeschoss:** Showroom, Restaurant, Umkleide, Großraumbüro.
+- Verbindung: Treppe und Aufzug direkt nebeneinander.
+- Ein abgetrennter Bereich nur für Logistiker im Hintergrund.
+- Auf Schildern steht deutlich „Kaiserslautern“.
+
+### 7.2 Charakter-Editor & Umkleide
+- Die Umkleide im Obergeschoss ist interaktiv.
+- Freie Wahl bei Spielstart und in der Umkleide: Geschlecht (männlich/weiblich), Herkunft, Alter (jung, mittelalt).
+- Haarfarben: Grau, Blond, Braun, Schwarz, Rot, Blau. Frisuren: gebunden, Zopf, kurz, Glatze, Halbglatze.
+- Verkauf: T-Shirt blau mit dunkelblauen Streifen ODER gelb mit dunkelgelben Streifen, schlichte schwarze Hose.
+- Logistik: gleiche T-Shirts, dunkelblaue Cargohose. Schuhe für alle: schwarz-rot mit roter Sohle.
+- Die 3D-Figur wird optisch aufgewertet.
+
+### 7.3 Gameplay & Lernen
+- Kund:innen laufen frei herum, sprechen den Spieler an und stellen fachliche Fragen.
+- Feste, leuchtende Zielpunkte starten Lern-Missionen, getrennt für Verkauf und Logistik.
+
+### 7.4 Entscheidungen (freigegeben mit Phase 1)
+- Etagen werden umgeschaltet statt gestapelt: nur die aktive Etage ist sichtbar, Treppe/Aufzug blenden kurz über. Physik und Kamera bleiben unverändert.
+- Ein Interaktions-System (src/interaktion.js) für Treppe, Aufzug, Schranke, später Umkleide, Missionen und Kund:innen.
+- Grundriss als Daten in src/karte.js. Schilder als selbst gezeichneter Text-Atlas (src/schilder.js).
+- 🔶 Herkunft im Editor als 6 Hauttöne + 2 Augenformen, ohne Klischee-Merkmale.
+- 🔶 Rolle ist in der Umkleide jederzeit wechselbar. Parkplatz, Multi-Blaster, Währungen und Pausenraum aus Teil 1 sind zurückgestellt.
