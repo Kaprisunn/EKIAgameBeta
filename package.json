@@ -1,0 +1,13 @@
+{
+  "name": "ekia-kaiserslautern",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "3D-Browser-Spiel im Spielzeug-Diorama-Look (Three.js, ohne Build-Schritt)",
+  "scripts": {
+    "check": "node tools/check.mjs"
+  },
+  "devDependencies": {
+    "three": "0.186.1"
+  }
+}
