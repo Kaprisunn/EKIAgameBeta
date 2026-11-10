@@ -1,0 +1,103 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<title>EKIA Kaiserslautern</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<style>
+/* Spielzeug-Diorama: Vollbild-3D, darüber eine dünne HTML-Schicht in Markenfarben. Bewusst nur ein (helles) Erscheinungsbild. */
+:root {
+  --blau: #0058ab; --blau-tief: #003f7d; --gelb: #fbd914; --weiss: #ffffff;
+  --birke: #e5c99b; --tinte: #23303d; --schatten: rgba(20, 40, 70, .28); --nebel: #f3e7cf;
+  --schrift: ui-rounded, "SF Pro Rounded", "Arial Rounded MT Bold", "Nunito", system-ui, sans-serif;
+  --rand-o: env(safe-area-inset-top, 0px); --rand-u: env(safe-area-inset-bottom, 0px);
+  --rand-l: env(safe-area-inset-left, 0px); --rand-r: env(safe-area-inset-right, 0px);
+  color-scheme: light;
+}
+[hidden] { display: none !important; }
+html, body { margin: 0; height: 100%; overflow: hidden; background: var(--nebel); color: var(--tinte); }
+body {
+  font: 600 18px/1.35 var(--schrift); position: fixed; inset: 0; height: 100dvh;
+  touch-action: none; -webkit-user-select: none; user-select: none; -webkit-touch-callout: none;
+  -webkit-tap-highlight-color: transparent; overscroll-behavior: none;
+}
+#spiel, #spiel canvas { position: fixed; inset: 0; width: 100%; height: 100%; display: block; }
+#vignette { position: fixed; inset: 0; pointer-events: none; background: radial-gradient(ellipse at 50% 45%, transparent 55%, rgba(35, 48, 61, .32) 100%); }
+#joyzone { position: fixed; left: 0; top: 0; bottom: 0; width: 50%; }
+.joy-basis { position: fixed; width: 132px; height: 132px; margin: -66px 0 0 -66px; border-radius: 50%;
+  background: rgba(255, 255, 255, .28); border: 3px solid rgba(255, 255, 255, .75); box-shadow: 0 4px 14px var(--schatten);
+  pointer-events: none; transition: opacity .2s; opacity: .55; }
+.joy-basis.aktiv { opacity: 1; transition: none; }
+.joy-knopf { position: absolute; left: 50%; top: 50%; width: 60px; height: 60px; margin: -30px 0 0 -30px; border-radius: 50%;
+  background: var(--gelb); border: 3px solid var(--blau); box-shadow: 0 3px 8px var(--schatten); }
+.rund { position: fixed; display: grid; place-items: center; border: 0; border-radius: 50%; cursor: pointer;
+  font: inherit; color: var(--blau-tief); box-shadow: 0 5px 0 var(--blau-tief), 0 8px 18px var(--schatten); touch-action: none; }
+.rund:active { transform: translateY(4px); box-shadow: 0 1px 0 var(--blau-tief), 0 4px 10px var(--schatten); }
+#aktion { right: calc(28px + var(--rand-r)); bottom: calc(32px + var(--rand-u)); width: 96px; height: 96px; background: var(--gelb); font-size: 44px; }
+#pauseKnopf { right: calc(16px + var(--rand-r)); top: calc(16px + var(--rand-o)); width: 64px; height: 64px; background: var(--weiss); font-size: 26px; }
+.tafel { position: fixed; left: 50%; top: 50%; transform: translate(-50%, -50%); width: min(440px, calc(100vw - 32px));
+  box-sizing: border-box; padding: 28px 28px 24px; border-radius: 28px; background: var(--weiss); text-align: center;
+  box-shadow: 0 10px 0 var(--birke), 0 18px 40px var(--schatten); display: grid; gap: 14px; }
+.tafel h1 { margin: 0; font-size: 40px; line-height: 1; color: var(--blau); letter-spacing: .02em; text-wrap: balance; }
+.tafel h1 small { display: block; margin-top: 6px; font-size: 20px; color: var(--tinte); letter-spacing: .08em; text-transform: uppercase; }
+.tafel p { margin: 0; font-weight: 500; }
+.tafel .klein { font-size: 18px; opacity: .75; }
+.knopf { min-height: 64px; padding: 0 28px; border: 0; border-radius: 32px; background: var(--gelb); color: var(--blau-tief);
+  font: 800 22px var(--schrift); cursor: pointer; box-shadow: 0 5px 0 var(--blau-tief); touch-action: none; }
+.knopf:active { transform: translateY(4px); box-shadow: 0 1px 0 var(--blau-tief); }
+.knopf:focus-visible, .rund:focus-visible { outline: 4px solid var(--blau); outline-offset: 3px; }
+#toast { position: fixed; left: 50%; top: calc(18px + var(--rand-o)); transform: translateX(-50%); max-width: calc(100vw - 180px);
+  padding: 12px 22px; border-radius: 24px; background: var(--blau); color: var(--weiss); box-shadow: 0 6px 16px var(--schatten);
+  text-align: center; pointer-events: none; }
+#hoch { display: none; position: fixed; left: 16px; right: 16px; bottom: calc(150px + var(--rand-u)); text-align: center; pointer-events: none; }
+#hoch span { display: inline-block; padding: 10px 18px; border-radius: 20px; background: rgba(255, 255, 255, .92); color: var(--tinte); }
+@media (orientation: portrait) { #hoch { display: block; } }
+#fehler { position: fixed; inset: auto 16px calc(16px + var(--rand-u)); z-index: 9; padding: 16px 20px; border-radius: 20px;
+  background: #fff3f0; color: #7a1d10; border: 3px solid #d9483b; font: 600 18px/1.35 var(--schrift); display: grid; gap: 10px;
+  max-height: 50vh; overflow: auto; user-select: text; -webkit-user-select: text; }
+#fehler pre { margin: 0; white-space: pre-wrap; font-size: 15px; }
+@media (prefers-reduced-motion: reduce) { .joy-basis { transition: none; } }
+</style>
+</head>
+<body>
+<div id="spiel"></div>
+<div id="vignette"></div>
+<div id="joyzone" hidden><div class="joy-basis"><div class="joy-knopf"></div></div></div>
+<button id="aktion" class="rund" type="button" aria-label="Winken" hidden>👋</button>
+<button id="pauseKnopf" class="rund" type="button" aria-label="Pause" hidden>❚❚</button>
+<div id="toast" hidden></div>
+<div id="hoch"><span>Tipp: iPad quer halten für mehr Überblick</span></div>
+<section id="menue" class="tafel">
+  <h1>EKIA<small>Kaiserslautern</small></h1>
+  <p>Deine erste Schicht beginnt. Schau dich in der Halle um!</p>
+  <button id="startKnopf" class="knopf" type="button" disabled>Halle wird aufgebaut …</button>
+  <p class="klein">Links ziehen: laufen · 👋: winken<br>Tastatur: WASD oder Pfeile, Leertaste, P</p>
+</section>
+<section id="pause" class="tafel" hidden>
+  <h1>Pause</h1>
+  <p>Kurz durchatmen. Die Halle wartet.</p>
+  <button id="weiterKnopf" class="knopf" type="button">Weiter</button>
+</section>
+<div id="fehler" hidden></div>
+<script>
+// Fängt jeden Fehler ab und zeigt ihn im Spiel statt eines leeren Bildschirms.
+window.__zeigeFehler = function (e) {
+  var box = document.getElementById('fehler'), text = (e && (e.stack || e.message)) || String(e);
+  if (!box.hidden) { box.querySelector('pre').textContent += '\n' + text; return; }
+  box.innerHTML = '<b>Hoppla, da hakt etwas.</b><pre></pre><button class="knopf" type="button" onclick="location.reload()">Neu laden</button>';
+  box.querySelector('pre').textContent = text; box.hidden = false;
+};
+window.addEventListener('error', function (ev) { window.__zeigeFehler(ev.error || ev.message); });
+window.addEventListener('unhandledrejection', function (ev) { window.__zeigeFehler(ev.reason); });
+setTimeout(function () { if (!window.__bereit) window.__zeigeFehler('Das Spiel lädt nicht. Prüfe die Internetverbindung und lade neu.'); }, 15000);
+</script>
+<script type="importmap">
+{ "imports": {
+  "three": "https://cdn.jsdelivr.net/npm/three@0.186.1/build/three.module.js",
+  "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.186.1/examples/jsm/"
+} }
+</script>
+<script type="module" src="src/main.js" onerror="__zeigeFehler('Spieldateien konnten nicht geladen werden. Bitte neu laden.')"></script>
+</body>
+</html>
