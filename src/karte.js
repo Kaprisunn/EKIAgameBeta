@@ -1,81 +1,101 @@
-// Grundriss beider Etagen als reine Daten. Halle 52 × 36 (x -26..26, z -18..18), Kamera schaut von Süden.
-// moebel:   [typ, x, z, drehung]                       (Typen in moebel.js und moebel-og.js)
-// schilder: [text, x, y, z, höhe, stil, kipp, drehY, seile]  (Stile: blau, gelb, weiss, warn)
-// punkte:   Interaktionen. treppe/schranke lösen beim Betreten aus, aufzug über den Aktionsknopf.
+// Grundriss beider Etagen als reine Daten. Halle 64 × 44 (x -32..32, z -22..22), Kamera schaut von Süden.
+// moebel:   [typ, x, z, drehung]   (Typen in moebel.js, moebel-og.js, moebel-deko.js)
+// schilder: [text, x, y, z, höhe, stil, kipp, drehY, seile]   (Stile: blau, gelb, weiss, warn)
+// punkte:   Interaktionen. treppe/schranke lösen beim Betreten aus, der Rest über den Aktionsknopf.
 //           ankunft = [x, z, blickrichtung] auf der Ziel-Etage.
-const R = Math.PI / 2, TREPPE = -24.4, AUFZUG = -20.4;
+// Wer im Haus unterwegs ist (Kund:innen, Kolleg:innen), steht in leute.js.
+const R = Math.PI / 2, TREPPE = -29.4, AUFZUG = -25.4;
+const SAEULEN = [[-26, -8], [-11, -8], [4, -7.5], [-4, 5], [13, 2.5]].map(([x, z]) => ['saeule', x, z]);
+const REGALE = [-22, -17.5, -13, -8.5, -4, 0.5, 5, 9.5];
 
 export const ETAGEN = {
   eg: {
     name: 'Erdgeschoss', kurz: 'EG', boden: 0xc9cdd2, sockel: 0,
     moebel: [
-      ['treppeAuf', TREPPE, 8.5], ['aufzug', AUFZUG, 6.5], ['tor', -14, 17.4], ['tor', 21, 17.4],
+      ['treppeAuf', TREPPE, 10.5], ['aufzug', AUFZUG, 8.5], ['tor', -20, 21.4], ['tor', 12, 21.4], ...SAEULEN,
       // Markthalle
-      ['marktregal', -16, -1], ['marktregal', -12.5, -1], ['marktregal', -9, -1],
-      ['marktregal', -16, 5], ['marktregal', -12.5, 5], ['marktregal', -9, 5],
-      ['wuehltisch', -12.5, 11.5], ['wuehltisch', -5, 2],
-      // SB-Halle
-      ['hochregal', -14, -11], ['hochregal', -10, -11], ['hochregal', -6, -11], ['hochregal', -2, -11], ['hochregal', 2, -11],
-      ['palette', -16.5, -5.5], ['palette', 4.5, -6],
+      ...[-21, -17, -13].flatMap((x) => [['marktregal', x, -3], ['marktregal', x, 3.5]]),
+      ['wuehltisch', -17, 10.5], ['wuehltisch', -8.5, 0], ['lampen', -9, 7.5], ['bilderwand', -11, 14],
+      ['pflanzenstand', -8.5, -6], ['koerbe', -21.5, 9.5], ['teppiche', -12.5, 9.5],
+      // SB-Halle mit breiten Gängen und Abholbereich
+      ...REGALE.map((x) => ['hochregal', x, -16]),
+      ['palette', -0.5, -9.6], ['palette', 14, -18], ['palette', 16.6, -18], ['palette', 14, -14.4], ['hubwagen', 16.4, -11],
       // Logistik (hinter Zaun und Schranke)
-      ['hochregal', 21, -16.6, R], ['stapler', 12.5, -13.5, R], ['rolltor', 12.5, -17.9],
-      ['palette', 19, -11.5], ['palette', 21.5, -11.2], ['palette', 24, -11.6],
-      ['rollwagen', 10, -9.6], ['rollwagen', 11.4, -9.6], ['rollwagen', 24.6, -14.2],
-      // Fundgrube, Kassen, Hotdog-Stand
-      ['fundgrube', 20, -2],
-      ['kasse', 4, 11], ['kasse', 8, 11], ['kasse', 12, 11], ['sbkasse', 15.5, 13.6], ['sbkasse', 17.5, 13.6],
-      ['hotdog', 22.5, 9], ['bistro', 19.2, 11.2], ['bistro', 22, 12.8],
-      ['pflanze', -19, 15.8], ['pflanze', -9, 15.8], ['pflanze', -0.5, 4], ['pflanze', 6.5, -4.5],
-      ['pflanze', 15, 2], ['pflanze', 25, 16], ['pflanze', -25, -4], ['pflanze', 1.5, 15.8],
+      ['hochregal', 26, -19.8, R], ['hochregal', 26, -15.2, R], ['stapler', 23.5, -9, R], ['rolltor', 31.9, -6, -R],
+      ['palette', 29, -10], ['palette', 29, -6.5], ['palette', 29.5, 3],
+      ['rollwagen', 22.5, 2], ['rollwagen', 23.8, 2], ['rollwagen', 30.5, -14],
+      // Click & Collect: Theke vor dem offenen Lagertor
+      ['ccTheke', 26, 11.5], ['torOffen', 26.5, 8],
+      // Fundgrube, Kassen, Ausgang
+      ['fundgrube', 10, -4],
+      ...[-2, 2, 6, 10, 14].map((x) => ['kasse', x, 12]), ...[-2, 6, 14].map((x) => ['absperrung', x, 8.4, R]),
+      ['sbkasse', 17.5, 10.5, -R], ['sbkasse', 17.5, 12, -R], ['sbkasse', 17.5, 13.5, -R],
+      ['hotdog', 0, 17.6], ['bistro', -4.2, 16.4], ['bistro', 4.2, 16.4], ['taschen', 16, 15.6],
+      ['wagenreihe', -27, 19.5], ['wagenreihe', 5, 20.2],
+      ['pflanze', -30.5, -6], ['pflanze', -30.5, 18], ['pflanze', -12, 19.8], ['pflanze', 18.6, 18], ['pflanze', 31, 18],
+      ['pflanze', -6, 13], ['pflanze', 17, 1],
     ],
-    zaeune: [[8, -8, 14, -8], [17.4, -8, 26, -8], [8, -18, 8, -8]],
-    schranke: { x: 14, z: -8, laenge: 3.4 },
+    zaeune: [[20, -22, 20, -5], [20, -1.6, 20, 11.4], [20, 8, 24.1, 8], [28.9, 8, 32, 8]],
+    schranke: { x: 20, z: -5, laenge: 3.4, dreh: -R, innen: [20, -22, 32, 11] },
     schilder: [
-      ['EKIA Kaiserslautern', -4, 3.5, -17.7, 1.5, 'blau'],
-      ['Willkommen in Kaiserslautern', -11, 3.4, 13.2, 0.7, 'blau', 0.45, 0, true],
-      ['Eingang', -14, 3.3, 17.68, 0.42, 'gelb'], ['Ausgang', 21, 3.3, 17.68, 0.42, 'gelb'],
-      ['Treppe zum Obergeschoss', TREPPE, 3.2, 12.9, 0.5, 'weiss', 0.4, 0, true],
-      ['Aufzug', AUFZUG, 3.75, 8.08, 0.45, 'weiss'],
-      ['Markthalle', -12.5, 3.5, 2, 0.8, 'gelb', 0.45, 0, true],
-      ['SB-Halle', -6, 4.3, -6, 0.8, 'gelb', 0.45, 0, true],
-      ...[1, 2, 3, 4, 5].map((n) => [`Gang ${n}`, -18 + n * 4, 3.95, -7.35, 0.42, 'blau', 0.3]),
-      ['Kassen', 8, 3.5, 7.8, 0.75, 'gelb', 0.45, 0, true],
-      ['Hot Dogs', 22.5, 3.05, 10.05, 0.5, 'blau', 0.2],
-      ['Fundgrube', 20, 3.3, -4.4, 0.7, 'gelb', 0.45, 0, true],
-      ['Nur für Logistik', 15.7, 3.1, -7.8, 0.32, 'warn'],
-      ['Wareneingang', 12.5, 4.05, -17.75, 0.5, 'weiss'],
+      ['EKIA Kaiserslautern', -6, 3.9, -21.7, 1.2, 'blau'],
+      ['Hej Kaiserslautern!', -28, 3.0, -21.7, 0.8, 'gelb'],
+      ['Angebote der Woche', 15.5, 3.0, -21.7, 0.6, 'weiss'],
+      ['Willkommen in Kaiserslautern', -20, 3.95, 21.66, 0.5, 'blau'],
+      ['Eingang', -20, 3.3, 21.68, 0.42, 'gelb'], ['Ausgang', 12, 3.3, 21.68, 0.42, 'gelb'],
+      ['Treppe zum Obergeschoss', TREPPE, 3.2, 14.9, 0.5, 'weiss', 0.4, 0, true],
+      ['Aufzug', AUFZUG, 3.75, 10.08, 0.45, 'weiss'],
+      ['Markthalle', -15, 3.5, 0.3, 0.8, 'gelb', 0.45, 0, true],
+      ['SB-Halle', -6, 4.3, -10.5, 0.8, 'gelb', 0.45, 0, true],
+      ...REGALE.map((x, i) => [`Gang ${i + 1}`, x, 3.95, -12.35, 0.42, 'blau', 0.3]),
+      ['Kassen', 6, 3.5, 7.6, 0.75, 'gelb', 0.45, 0, true],
+      ['Hot Dogs', 0, 3.05, 18.65, 0.5, 'blau', 0.2],
+      ['Fundgrube', 10, 3.3, -6.4, 0.7, 'gelb', 0.45, 0, true],
+      ['Nur für Logistik', 19.8, 3.1, -3.3, 0.32, 'warn', 0, -0.8],
+      ['Wareneingang', 29.5, 4.3, -3, 0.5, 'weiss', 0.4, 0, true],
+      ['Click & Collect', 26, 3.75, 13, 0.75, 'blau', 0.45, 0, true],
+      ['Kundenservice · Warenausgabe', 26, 2.95, 13.05, 0.4, 'weiss', 0.45],
+      ['Lager · Warenausgabe', 26.5, 3.6, 8.3, 0.4, 'warn'],
     ],
     punkte: [
-      { art: 'treppe', x: TREPPE, z: 11.7, r: 1.2, ziel: 'og', ankunft: [TREPPE, 3.4, Math.PI] },
-      { art: 'aufzug', x: AUFZUG, z: 9.3, r: 1.7, ziel: 'og', ankunft: [AUFZUG, 9.6, 0] },
-      { art: 'schranke', x: 15.7, z: -6.9, r: 2.4 },
+      { art: 'treppe', x: TREPPE, z: 13.7, r: 1.2, ziel: 'og', ankunft: [TREPPE, 5.4, Math.PI] },
+      { art: 'aufzug', x: AUFZUG, z: 11.3, r: 1.7, ziel: 'og', ankunft: [AUFZUG, 11.6, 0] },
+      { art: 'schranke', x: 18.4, z: -3.3, r: 2.2 },
     ],
-    pfeile: [[-22, 14], [-17.5, 12], [-17.5, -4.5], [0, -5.5], [6, -2], [6, 15.2], [19, 15.6], [21, 17.2]],
+    pfeile: [[-27.5, 16.5], [-19.5, 15], [-19, -7], [-15, -11.2], [14, -11.2], [17, -8], [17, 4], [8, 6.5], [8, 15.5], [12, 20.8]],
   },
 
   og: {
     name: 'Obergeschoss', kurz: 'OG', boden: 0xb98e60, dielen: true, sockel: 5,
     moebel: [
-      ['treppeAb', TREPPE, 8.5], ['aufzug', AUFZUG, 6.5],
-      // Showroom und Restaurant (Umkleide und Großraumbüro folgen in M3)
-      ['wohnzimmer', -4, -14.25], ['schlafzimmer', 2.8, -14.25],
-      ['tischgruppe', 15.5, -12.5], ['tischgruppe', 19.5, -12.5], ['tischgruppe', 15.5, -8],
-      ['tischgruppe', 19.5, -8], ['tischgruppe', 15.5, -3.5], ['tischgruppe', 19.5, -3.5], ['theke', 18, -17.35],
-      ['pflanze', -10, -16.8], ['pflanze', 8.5, -16.8], ['pflanze', -12, 12], ['pflanze', 10, 10], ['pflanze', 24.5, 15.5], ['pflanze', 24.5, -16.8],
+      ['treppeAb', TREPPE, 10.5], ['aufzug', AUFZUG, 8.5], ...SAEULEN,
+      // Showroom: vier Wohnkojen an der Rückwand
+      ['wohnzimmer', -20, -18.25], ['schlafzimmer', -13.2, -18.25], ['kueche', -6.2, -18.25], ['kinderzimmer', 0.4, -18.25],
+      // Restaurant
+      ...[17, 21.5, 26].flatMap((x) => [-17, -12.5, -8].map((z) => ['tischgruppe', x, z])), ['theke', 24, -21.35],
+      // Umkleide und Großraumbüro (hinter niedrigen Trennwänden)
+      ['spinde', -12.8, 13.45], ['spiegel', -10.1, 13.45], ['kabine', -19.6, 18.5],
+      ...[6, 11, 16, 21, 26].map((x) => ['schreibtische', x, 17]),
+      ['pflanze', -30, -20], ['pflanze', 7, -20], ['pflanze', 12, -20], ['pflanze', 31, -2], ['pflanze', -30, 0],
+      ['pflanze', 3.5, 20], ['pflanze', 30.5, 20], ['pflanze', -7, 19.5], ['pflanze', -23, 20],
     ],
+    trennwaende: [[-21, 13, -19.5, 13], [-16.5, 13, -9, 13], [-21, 13, -21, 21.4], [-9, 13, -9, 21.4],
+      [1, 13, 11.5, 13], [14.5, 13, 32, 13], [1, 13, 1, 21.4]],
     schilder: [
-      ['EKIA Kaiserslautern', 8, 3.5, -17.7, 1.3, 'blau'],
-      ['Showroom', -1, 3.6, -9.5, 0.8, 'gelb', 0.45, 0, true],
-      ['Restaurant', 17.5, 3.6, -10.2, 0.8, 'gelb', 0.45, 0, true],
-      ['Obergeschoss', -12, 3.4, 9, 0.7, 'blau', 0.45, 0, true],
-      ['Umkleide & Büro folgen bald', -16, 3.2, -6, 0.5, 'weiss', 0.45, 0, true],
-      ['Treppe zum Erdgeschoss', TREPPE, 3.2, 12.4, 0.5, 'weiss', 0.4, 0, true],
-      ['Aufzug', AUFZUG, 3.75, 8.08, 0.45, 'weiss'],
+      ['EKIA Kaiserslautern', 10, 3.6, -21.7, 1.3, 'blau'],
+      ['Showroom', -10, 3.6, -13.5, 0.8, 'gelb', 0.45, 0, true],
+      ['Restaurant', 21.5, 3.6, -5, 0.8, 'gelb', 0.45, 0, true],
+      ['Obergeschoss', -16, 3.4, 4, 0.7, 'blau', 0.45, 0, true],
+      ['Umkleide', -18, 2.65, 13.25, 0.45, 'weiss', 0.3],
+      ['Großraumbüro', 13, 2.65, 13.25, 0.45, 'weiss', 0.3],
+      ['Treppe zum Erdgeschoss', TREPPE, 3.2, 14.6, 0.5, 'weiss', 0.4, 0, true],
+      ['Aufzug', AUFZUG, 3.75, 10.08, 0.45, 'weiss'],
     ],
     punkte: [
-      { art: 'treppe', x: TREPPE, z: 5.9, r: 1.2, ziel: 'eg', ankunft: [TREPPE, 13.4, 0] },
-      { art: 'aufzug', x: AUFZUG, z: 9.3, r: 1.7, ziel: 'eg', ankunft: [AUFZUG, 9.6, 0] },
+      { art: 'treppe', x: TREPPE, z: 7.9, r: 1.2, ziel: 'eg', ankunft: [TREPPE, 15.6, 0] },
+      { art: 'aufzug', x: AUFZUG, z: 11.3, r: 1.7, ziel: 'eg', ankunft: [AUFZUG, 11.6, 0] },
+      { art: 'umkleide', x: -15, z: 17, r: 2.2 },
     ],
-    pfeile: [[-22.5, 2.5], [-8, 1.5], [-8, -10], [8, -10], [11, 0], [0, 7], [-14, 8]],
+    pfeile: [[-29.4, 4], [-24, -11], [4, -12], [10, -4], [8, 8], [-6, 9], [-20, 6]],
   },
 };

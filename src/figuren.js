@@ -13,6 +13,7 @@ function gruppe(eltern, x, y, z) {
 }
 
 function frisur(s) {
+  if (s.frisur === 'glatze') return [];
   const h = s.haare, liste = [
     [() => kappe(0.565, Math.PI * 0.44), h, [0, 0.02, -0.02], [-0.32, 0, 0]],
     // Stirnsträhnen sitzen deutlich vor dem Gesicht, sonst verschwinden sie im Kopf
@@ -26,15 +27,22 @@ function frisur(s) {
 }
 
 export function baueFigur(s) {
-  const opt = { umriss: s.umriss, dicke: 0.032 };
+  const opt = { umriss: s.umriss, dicke: 0.032, schatten: !s.einfach };
   const wurzel = new THREE.Group();
   const koerper = gruppe(wurzel, 0, 0.74, 0);
 
   koerper.add(baueNetz([
     [() => zylinder(0.36, 0.34, 0.34, 12), s.hose, [0, 0.06, 0]],
     [() => kapsel(0.4, 0.36, 12), s.shirt, [0, 0.5, 0]],
-    [() => quader(0.17, 0.11, 0.05), s.schild, [-0.16, 0.66, 0.36], [0, -0.35, 0], [1, 1, 1], false],
+    ...(s.schild ? [[() => quader(0.17, 0.11, 0.05), s.schild, [-0.16, 0.66, 0.36], [0, -0.35, 0], [1, 1, 1], false]] : []),
   ], opt));
+
+  // Augen: weiße abgeflachte Kugel, dunkle Pupille, kleiner Glanzpunkt (y = Höhe über der Kopfmitte)
+  const auge = (x, y = 0) => [
+    [() => kugel(0.12, 10, 8), FARBE.weiss, [x, y, 0.45], [0, x * 0.8, 0], [1, 1.2, 0.55], false],
+    [() => kugel(0.07, 8, 6), FARBE.pupille, [x * 1.02, y - 0.01, 0.502], [0, x * 0.8, 0], [1, 1.15, 0.5], false],
+    [() => kugel(0.024, 6, 4), FARBE.weiss, [x - 0.025, y + 0.035, 0.54], [0, 0, 0], [1, 1, 1], false],
+  ];
 
   // Kopf mit Gesicht und Haaren; Ursprung = Kopfmitte
   const kopf = gruppe(koerper, 0, 1.4, 0);
@@ -45,16 +53,13 @@ export function baueFigur(s) {
     [() => kugel(0.08, 8, 6), FARBE.wange, [0.3, -0.13, 0.4], [0, 0.6, 0], [1, 0.6, 0.45], false],
     [() => ring(0.085, 0.022, Math.PI), FARBE.mund, [0, -0.19, 0.475], [0.25, 0, Math.PI], [1, 1, 1], false],
     ...frisur(s),
+    // Vereinfachte Figuren (Nebenfiguren): Augen direkt im Kopf, spart einen Draw Call
+    ...(s.einfach ? [...auge(-0.19, 0.07), ...auge(0.19, 0.07)] : []),
   ], opt));
 
-  // Augen: weiße abgeflachte Kugel, dunkle Pupille, kleiner Glanzpunkt. Gruppe wird zum Blinzeln gestaucht.
+  // Augen-Gruppe wird zum Blinzeln gestaucht (bei vereinfachten Figuren leer)
   const augen = gruppe(kopf, 0, 0.07, 0);
-  const auge = (x) => [
-    [() => kugel(0.12, 10, 8), FARBE.weiss, [x, 0, 0.45], [0, x * 0.8, 0], [1, 1.2, 0.55]],
-    [() => kugel(0.07, 8, 6), FARBE.pupille, [x * 1.02, -0.01, 0.502], [0, x * 0.8, 0], [1, 1.15, 0.5]],
-    [() => kugel(0.024, 6, 4), FARBE.weiss, [x - 0.025, 0.035, 0.54]],
-  ];
-  augen.add(baueNetz([...auge(-0.19), ...auge(0.19)], { schatten: false }));
+  if (!s.einfach) augen.add(baueNetz([...auge(-0.19), ...auge(0.19)], { schatten: false }));
 
   // Arme: Drehpunkt an der Schulter; Ärmel in Shirtfarbe, Unterarm und Hand in Hautfarbe
   const arm = (seite) => {
@@ -63,6 +68,9 @@ export function baueFigur(s) {
       [() => kapsel(0.15, 0.14, 10), s.shirt, [seite * 0.02, -0.1, 0]],
       [() => kapsel(0.105, 0.3, 8), s.haut, [seite * 0.03, -0.38, 0]],
       [() => kugel(0.135, 10, 8), s.haut, [seite * 0.03, -0.63, 0.02]],
+      // Einkaufstasche in der rechten Hand (nur Kund:innen)
+      ...(seite < 0 && s.tasche ? [[() => quader(0.36, 0.42, 0.16), s.tasche, [-0.05, -0.92, 0.02], [0, 0, 0], [1, 1, 1], false],
+        [() => quader(0.04, 0.22, 0.04), s.tasche, [-0.05, -0.66, 0.02], [0, 0, 0], [1, 1, 1], false]] : []),
     ], opt));
     return g;
   };

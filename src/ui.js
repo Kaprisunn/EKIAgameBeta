@@ -7,7 +7,7 @@ const $ = (id) => document.getElementById(id);
 export function erstelleUI({ start, weiter, pause, aktion, rolle }) {
   const el = {
     menue: $('menue'), pause: $('pause'), joy: $('joyzone'), aktion: $('aktion'), aktionText: $('aktionText'),
-    pauseKnopf: $('pauseKnopf'), start: $('startKnopf'), toast: $('toast'), blende: $('blende'), etage: $('etage'), rolle: $('rolleKnopf'),
+    pauseKnopf: $('pauseKnopf'), start: $('startKnopf'), toast: $('toast'), blende: $('blende'), etage: $('etage'), rolle: $('rolleKnopf'), blase: $('blase'),
   };
   const tippen = (knopf, f) => knopf.addEventListener('pointerdown', (e) => { e.preventDefault(); e.stopPropagation(); f(); });
   tippen(el.start, () => { if (!el.start.disabled) { ton.klick(); start(); } });
@@ -34,6 +34,7 @@ export function erstelleUI({ start, weiter, pause, aktion, rolle }) {
       el.etage.hidden = zustand === Z.MENUE;
       el.joy.hidden = el.aktion.hidden = el.pauseKnopf.hidden = !spiel;
       el.aktionText.hidden = !spiel || !el.aktionText.textContent;
+      if (!spiel) el.blase.hidden = true;
       if (spiel && !speicher.laden('steuerungGesehen', false)) {
         toast('Zieh links mit dem Finger, um zu laufen. 👋 rechts zum Winken.', 5000);
         speicher.speichern('steuerungGesehen', true);
@@ -48,11 +49,19 @@ export function erstelleUI({ start, weiter, pause, aktion, rolle }) {
       const art = p ? p.art + (p.ziel ?? '') : '';
       if (art === aktionArt) return;
       aktionArt = art;
-      const [symbol, text] = !p ? ['👋', ''] : p.art === 'aufzug' ? [p.ziel === 'og' ? '⬆️' : '⬇️', 'Aufzug'] : ['❗', ''];
+      const [symbol, text] = !p ? ['👋', ''] : p.art === 'aufzug' ? [p.ziel === 'og' ? '⬆️' : '⬇️', 'Aufzug']
+        : p.art === 'umkleide' ? ['👕', 'Umziehen'] : ['❗', ''];
       el.aktion.textContent = symbol;
       el.aktion.setAttribute('aria-label', text || 'Winken');
       el.aktionText.textContent = text;
       el.aktionText.hidden = !text;
+    },
+    // Sprechblase an Bildschirmposition (x, y) über einem Kopf; text = null blendet sie aus
+    blase(text, x, y) {
+      if (!text) { el.blase.hidden = true; return; }
+      if (el.blase.textContent !== text) el.blase.textContent = text;
+      el.blase.style.transform = `translate(${Math.round(x)}px, ${Math.round(y)}px) translate(-50%, -100%)`;
+      el.blase.hidden = false;
     },
     // Kurze Überblendung: abdunkeln, fn ausführen, wieder aufblenden
     blende(fn) {
