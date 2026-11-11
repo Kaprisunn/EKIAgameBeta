@@ -1,7 +1,7 @@
 # Stand: EKIA Kaiserslautern
 
 **Spiel-Link:** https://claude.ai/artifact/RHUECknAuqPv52VwFmCeHA
-**Letzter Meilenstein:** M6 Parkplatz, Glasschiebetür & Wagen-Rallye (fertig) · **Nächster:** M7 Multi-Blaster (PLAN.md)
+**Letzter Meilenstein:** M7 Multi-Blaster (fertig) · **Nächster:** M8 Mehr Lernfälle, Schicht & Feinschliff (PLAN.md)
 
 ## Was funktioniert
 - Drei Ebenen: Erdgeschoss, Obergeschoss (Treppe, Aufzug) und Parkplatz (Glasschiebetür am Ausgang EG ↔ Tür in der Fassade).
@@ -10,6 +10,8 @@
   6 Kund:innen (auch mit ❓), ein Logistik-Kollege an der Wagenbox.
 - Wagen-Rallye: am Wagenhäuschen (🛒) starten, 5 Wagen in 30 s einsammeln (Kette folgt), Anzeige im blauen Funk-Streifen,
   30 Punkte + 1 je Restsekunde. Bei Zeitablauf kein Verlust, neuer Versuch möglich.
+- Multi-Blaster: Station 🎯 vor der zweiten Wagenbox. 3 Wellen grummeliger Kund:innen laufen zum Eingang; 📡 Ring (Aktionsknopf/Leertaste)
+  und 🧆 Köttbullar (zweiter Knopf/K) machen sie glücklich (Herzchen, Tasche). 3 Punkte je Person, 15 Bonus. Getestet, max. 55 Draw Calls.
 - 12 Missionen (Ampel). Neu draußen: 🔴 „Wagen rollen weg“, 🟢 „Kofferraum-Tetris“ (Sortieren, jedes Shirt).
 - Charakter-Editor (Abteilung inkl. ComIn, P&C; Frau/Mann, Hautton, Alter mit Bart), Streifen-Shirts, Warnweste vor der Logistik,
   Minispiele (Timing, Sortieren), Kundenfragen je Abteilung, NPCs, HUD, Haus-Funk wie zuvor.
@@ -19,10 +21,11 @@
 ## Technik-Notizen
 - Ebenen in karte.js (eg, og, pp); Außen-Ebene: aussen: true (Asphalt, Fassade statt Wänden), linien, tueren.
 - Möbel draußen: moebel-aussen.js (Autos mit Farbe je Instanz über `farben`). Rallye: rallye.js.
-- window.__test: etage(id, x, z), profil, weste, mission(id), rallye(), fragende(), pos().
+- Blaster: blaster.js (Figuren werden beim ersten Start gebaut und wiederverwendet).
+- window.__test: etage(id, x, z), profil, weste, mission(id), rallye(), blaster(), feuer(art), fragende(), pos().
 
 ## Was fehlt
-- Multi-Blaster (M7), mehr Lernfälle, Schichtbericht und Figur-Feinschliff (M8). Leistung auf dem iPad ungeprüft.
+- Mehr Lernfälle, Schichtbericht und Figur-Feinschliff (M8). Während Rallye/Blaster sind andere Interaktionen pausiert. Leistung auf dem iPad ungeprüft.
 
 ## Bekannte Fehler
 - Kund:innen hängen manchmal kurz an Möbeln oder Autos. Hängende Schilder verdecken die Figur kurz beim Darunterlaufen.

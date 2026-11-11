@@ -11,6 +11,7 @@ import { erstelleLeute } from './npc.js';
 import { erstelleMissionen } from './missionen.js';
 import { erstelleKundenfragen } from './kundenfragen.js';
 import { erstelleRallye } from './rallye.js';
+import { erstelleBlaster } from './blaster.js';
 import { erstelleEditor } from './editor.js';
 import { weste } from './minispiele.js';
 import { ABTEILUNGEN } from './daten.js';
@@ -18,6 +19,7 @@ import { erstelleZustand, Z, speicher } from './zustand.js';
 import { ton } from './audio.js';
 
 const zeigeFehler = window.__zeigeFehler || ((e) => console.error(e));
+const FEUER = { art: 'feuer' }; // Aktionsknopf während des Multi-Blasters
 const STANDARD = { abteilung: 'verkauf', geschlecht: 'w', haut: 'mittel', alter: 'jung' };
 const BREIT = () => window.innerWidth >= 1000; // Menü steht links, Figur rechts daneben
 
@@ -89,7 +91,8 @@ function starte() {
     treppe: wechsleEtage,
     aufzug: (p) => { ton.ding(); wechsleEtage(p); },
     tuer: (p) => { ton.tuer(); wechsleEtage(p); },
-    rallye: () => { if (!rallye.aktiv) rallye.starte(); },
+    rallye: () => { if (!rallye.aktiv && !blaster.aktiv) rallye.starte(); },
+    blaster: () => { if (!blaster.aktiv && !rallye.aktiv) blaster.starte(); },
     schranke: () => { if (!profil.weste) warnweste(); },
     spind: () => {
       tafelOffen = true;
@@ -103,6 +106,7 @@ function starte() {
   const aktion = () => {
     if (zustand.get() !== Z.SPIEL) return;
     if (tafelOffen) { ui.taste(); return; }
+    if (blaster.aktiv) { blaster.feuer('ring', spieler.pos, spieler.blick); return; }
     if (interaktion.nah) interaktion.ausloesen();
     else { spieler.winken(); leute.winken(spieler.pos); }
   };
@@ -115,11 +119,13 @@ function starte() {
     weiter: () => zustand.setze(Z.SPIEL),
     pause: umschaltenPause,
     aktion,
+    aktion2: () => { if (zustand.get() === Z.SPIEL && blaster.aktiv && !tafelOffen) blaster.feuer('snack', spieler.pos, spieler.blick); },
     zuruecksetzen: () => { missionen.zuruecksetzen(); hud(); ui.toast('Alle Missionen sind wieder offen.'); },
   });
   const missionen = erstelleMissionen({ welt, leute, ui });
   const kundenfragen = erstelleKundenfragen({ welt, leute, ui, missionen });
   const rallye = erstelleRallye({ welt, ui, missionen });
+  const blaster = erstelleBlaster({ welt, ui, missionen });
   // Neue Abteilung = neue Kleidung, die Warnweste muss dann neu angelegt werden
   erstelleEditor(document.getElementById('editor'), profil, (feld) => {
     if (feld === 'abteilung') profil.weste = false;
@@ -127,6 +133,7 @@ function starte() {
   });
   const eingabe = erstelleEingabe({
     aktion,
+    aktion2: () => { if (zustand.get() === Z.SPIEL && blaster.aktiv && !tafelOffen) blaster.feuer('snack', spieler.pos, spieler.blick); },
     pause: umschaltenPause,
     start: () => { if (zustand.get() === Z.MENUE) zustand.setze(Z.SPIEL); },
   });
@@ -155,10 +162,12 @@ function starte() {
     weste: warnweste,
     fragende: () => leute.fragende(welt.etage.id).length,
     rallye: () => rallye.starte(),
+    blaster: () => blaster.starte(),
+    feuer: (art) => blaster.feuer(art, spieler.pos, spieler.blick),
     pos: () => [Math.round(spieler.pos.x * 10) / 10, Math.round(spieler.pos.z * 10) / 10],
     mission: (id) => missionen.starte(id, shirt(), missionFertig) && (tafelOffen = true),
   };
-  let letzte = performance.now(), messZeit = 0, messBilder = 0;
+  let letzte = performance.now(), messZeit = 0, messBilder = 0, letztePunkte = -1;
 
   // Sprechblase über dem Kopf: 3D-Punkt in Bildschirmkoordinaten umrechnen
   const kopf = new THREE.Vector3();
@@ -185,12 +194,15 @@ function starte() {
         leute.schiebeSpieler(spieler.pos);
         kundenfragen.update(dt, welt.etage.id);
         rallye.update(dt, welt.etage.id, spieler.pos);
+        blaster.update(dt, welt.etage.id, spieler.pos);
         welt.update(dt, spieler.pos, profil.weste ? 'logistik' : 'ohneWeste');
         const funk = missionen.update(dt, welt.etage.id);
         if (z === Z.SPIEL) {
-          ui.aktion(tafelOffen ? null : interaktion.update(welt.etage.punkte, spieler.pos));
-          ui.funk(rallye.aktiv ? rallye.text : funk, rallye.aktiv);
-          if (rallye.aktiv) hud();
+          ui.aktion(tafelOffen ? null : blaster.aktiv ? FEUER : interaktion.update(welt.etage.punkte, spieler.pos));
+          ui.blaster(blaster.aktiv);
+          const spiel = rallye.aktiv ? rallye.text : blaster.aktiv ? blaster.text : null;
+          ui.funk(spiel ?? funk, !!spiel);
+          if (missionen.punkte !== letztePunkte) { letztePunkte = missionen.punkte; hud(); }
         }
         kam.folge(spieler.pos, spieler.tempo, dt);
         welt.folgeSonne(spieler.pos);

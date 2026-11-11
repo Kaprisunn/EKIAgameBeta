@@ -9,7 +9,7 @@
 /* Spielzeug-Diorama: Vollbild-3D, darüber eine dünne HTML-Schicht in Markenfarben. Bewusst nur ein (helles) Erscheinungsbild. */
 :root {
   --blau: #0058ab; --blau-tief: #003f7d; --gelb: #fbd914; --weiss: #ffffff;
-  --birke: #e5c99b; --rot: #d9362b; --gruen: #2e9e4f; --tinte: #23303d; --schatten: rgba(20, 40, 70, .28); --nebel: #f3e7cf;
+  --birke: #e5c99b; --rot: #d9362b; --orange: #e8833a; --gruen: #2e9e4f; --tinte: #23303d; --schatten: rgba(20, 40, 70, .28); --nebel: #f3e7cf;
   --schrift: ui-rounded, "SF Pro Rounded", "Arial Rounded MT Bold", "Nunito", system-ui, sans-serif;
   --rand-o: env(safe-area-inset-top, 0px); --rand-u: env(safe-area-inset-bottom, 0px);
   --rand-l: env(safe-area-inset-left, 0px); --rand-r: env(safe-area-inset-right, 0px);
@@ -35,6 +35,7 @@ body {
   font: inherit; color: var(--blau-tief); box-shadow: 0 5px 0 var(--blau-tief), 0 8px 18px var(--schatten); touch-action: none; }
 .rund:active { transform: translateY(4px); box-shadow: 0 1px 0 var(--blau-tief), 0 4px 10px var(--schatten); }
 #aktion { right: calc(28px + var(--rand-r)); bottom: calc(32px + var(--rand-u)); width: 96px; height: 96px; background: var(--gelb); font-size: 44px; }
+#aktion2 { right: calc(140px + var(--rand-r)); bottom: calc(36px + var(--rand-u)); width: 80px; height: 80px; background: var(--orange); font-size: 38px; }
 #pauseKnopf { right: calc(16px + var(--rand-r)); top: calc(16px + var(--rand-o)); width: 64px; height: 64px; background: var(--weiss); font-size: 26px; }
 .tafel { position: fixed; left: 50%; top: 50%; transform: translate(-50%, -50%); width: min(440px, calc(100vw - 32px));
   box-sizing: border-box; padding: 28px 28px 24px; border-radius: 28px; background: var(--weiss); text-align: center;
@@ -83,7 +84,7 @@ body {
 .antwort.richtig { opacity: 1; background: #e3f6e8; border-color: var(--gruen); }
 #dRueck { padding: 12px 16px; border-radius: 16px; }
 #dRueck.ok { background: #e3f6e8; color: #17532a; } #dRueck.falsch { background: #fff4d6; color: #6b4b00; }
-body.dialog #aktion, body.dialog #aktionText, body.dialog #joyzone { display: none !important; }
+body.dialog #aktion, body.dialog #aktion2, body.dialog #aktionText, body.dialog #joyzone { display: none !important; }
 .chip { min-height: 64px; padding: 0 16px; border: 3px solid var(--blau); border-radius: 32px; background: var(--weiss); color: var(--blau-tief);
   font: 700 18px var(--schrift); cursor: pointer; touch-action: none; }
 .chip.gewaehlt { background: var(--blau); color: var(--weiss); }
@@ -122,6 +123,7 @@ body.dialog #aktion, body.dialog #aktionText, body.dialog #joyzone { display: no
 <div id="vignette"></div>
 <div id="joyzone" hidden><div class="joy-basis"><div class="joy-knopf"></div></div></div>
 <button id="aktion" class="rund" type="button" aria-label="Winken" hidden>👋</button>
+<button id="aktion2" class="rund" type="button" aria-label="Köttbullar werfen" hidden>🧆</button>
 <button id="pauseKnopf" class="rund" type="button" aria-label="Pause" hidden>❚❚</button>
 <div id="blase" hidden></div>
 <div id="aktionText" hidden></div>
