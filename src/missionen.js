@@ -5,9 +5,11 @@ import { MISSIONEN, PUNKTE } from './lerninhalte.js';
 import { material, teil, quader } from './formen.js';
 import { FARBE } from './daten.js';
 import { speicher } from './zustand.js';
+import { auswahl, timing, sortieren } from './minispiele.js';
 
 const NOETIG = { verkauf: 'gelb', logistik: 'blau' };
-const SHIRT_NAME = { gelb: 'das gelbe Shirt (Verkauf)', blau: 'das blaue Shirt (Logistik und Restaurant)' };
+const SPIELE = { auswahl, timing, sortieren };
+const SHIRT_NAME = { gelb: 'das gelbe Streifen-Shirt (Verkauf)', blau: 'das blaue Streifen-Shirt (Logistik, Restaurant, ComIn, P&C)' };
 
 // Drei glänzende Symbole in einer kleinen, selbst gezeichneten Textur (je 128 × 128 Pixel)
 function markerMaterialien() {
@@ -109,22 +111,28 @@ export function erstelleMissionen({ welt, leute, ui }) {
       if (!e || !offen(e)) return false;
       const m = e.m, noetig = m.art === 'rot' ? null : NOETIG[m.zone];
       if (noetig && noetig !== shirt) {
-        ui.toast(`Für diese Aufgabe brauchst du ${SHIRT_NAME[noetig]}. Spinde: EG neben der SB-Halle, OG in der Umkleide.`, 4500);
+        ui.toast(`Für diese Aufgabe brauchst du ${SHIRT_NAME[noetig]}. Umziehen am Spind: EG neben der SB-Halle, OG in der Umkleide.`, 4500);
         return false;
       }
-      ui.frage(m, (wahl) => {
-        if (wahl !== m.richtig) {
+      // Je nach Typ ein Minispiel (Timing, Sortieren) oder die Auswahl mit drei Antworten
+      ui.tafel(m, (box, melde) => SPIELE[m.typ ?? 'auswahl'](box, m, (ok) => {
+        if (!ok) {
           e.versuche++;
-          return { richtig: false, text: `Noch nicht ganz. Denk-Tipp: ${m.tipp}` };
+          melde({ richtig: false, text: `Noch nicht ganz. Denk-Tipp: ${m.tipp}` });
+          return;
         }
         const p = e.versuche ? Math.ceil(PUNKTE[m.art] / 2) : PUNKTE[m.art];
         stand.punkte += p;
         stand.erledigt.push(m.id);
         speicher.speichern('missionen', stand);
         aufbauen();
-        return { richtig: true, text: `Richtig! +${p} Punkte. ${m.warum}` };
-      }, fertig);
+        melde({ richtig: true, text: `Geschafft! +${p} Punkte. ${m.warum}` });
+      }), fertig);
       return true;
+    },
+    punkteDazu(p) {
+      stand.punkte += p;
+      speicher.speichern('missionen', stand);
     },
     zuruecksetzen() {
       stand.erledigt = [];

@@ -3,14 +3,18 @@
 import * as THREE from 'three';
 import { baueFigur } from './figuren.js';
 import { neueAnimation, animiere, starteWinken } from './animation.js';
-import { FIGUREN, FARBE, START, SPIELER } from './daten.js';
+import { FARBE, START, SPIELER, ABTEILUNGEN, SHIRTS, HAUTTOENE, HAARE_JUNG, WESTE } from './daten.js';
 import { ton } from './audio.js';
 
-// Kleiderordnung: Gelb = Verkauf (schwarze Hose), Blau = Logistik und Restaurant (dunkelblaue Hose)
-const KLEIDUNG = {
-  gelb: { shirt: FARBE.gelb, hose: 0x2b2b30, schild: FARBE.blau },
-  blau: { shirt: FARBE.blau, hose: 0x1e2f55, schild: FARBE.gelb },
-};
+// Steckbrief aus dem Profil: Abteilung bestimmt das Streifen-Shirt, dazu Aussehen und Warnweste
+export function steckbriefAus(p) {
+  const s = SHIRTS[ABTEILUNGEN[p.abteilung].shirt], alt = p.alter === 'alt', frau = p.geschlecht === 'w';
+  return {
+    haut: HAUTTOENE[p.haut], haare: alt ? 0xf4f4f4 : HAARE_JUNG[p.haut], frisur: frau ? (alt ? 'dutt' : 'zopf') : 'kurz', bart: !frau && alt,
+    shirt: s.shirt, streifen: s.streifen, schild: s.schild, hose: p.abteilung === 'logistik' ? 0x1e2f55 : 0x2b2b30,
+    schuhe: FARBE.umriss, schuerze: p.abteilung === 'restaurant', weste: p.weste, groesse: frau ? 0.96 : 1, umriss: true,
+  };
+}
 const WIRBEL_DAUER = 0.45;
 
 // Farb-Wirbel beim Umziehen: ein kleiner Sternchen-Kreis, der sich hochschraubt und verblasst
@@ -23,22 +27,22 @@ function wirbel() {
   return punkte;
 }
 
-export function erstelleSpieler(szene, welt, shirt = 'gelb') {
+export function erstelleSpieler(szene, welt, steckbrief) {
   const huelle = new THREE.Group(), pos = huelle.position.set(START.x, 0, START.z), funken = wirbel();
   huelle.add(funken);
   szene.add(huelle);
   const anim = neueAnimation(), tempo = new THREE.Vector3();
   let figur = null, blickwinkel = 0, wirbelZeit = 0;
 
-  function kleide(farbe) {
+  function kleide(s) {
     if (figur) {
       huelle.remove(figur.wurzel);
       figur.wurzel.traverse((o) => o.geometry?.dispose());
     }
-    figur = baueFigur({ ...FIGUREN.spieler, ...KLEIDUNG[farbe] });
+    figur = baueFigur(s);
     huelle.add(figur.wurzel);
   }
-  kleide(shirt);
+  kleide(steckbrief);
 
   return {
     pos,
@@ -51,10 +55,11 @@ export function erstelleSpieler(szene, welt, shirt = 'gelb') {
       blickwinkel = dreh;
       huelle.rotation.y = dreh;
     },
-    // Shirt wechseln: Figur neu bauen und kurz einen Farb-Wirbel zeigen
-    setzeShirt(farbe) {
-      kleide(farbe);
-      funken.material.color.set(KLEIDUNG[farbe].shirt);
+    // Umziehen: Figur neu bauen und (mit Effekt) kurz einen Farb-Wirbel zeigen
+    setze(s, effekt = true) {
+      kleide(s);
+      if (!effekt) return;
+      funken.material.color.set(s.weste ? WESTE.grund : s.shirt);
       wirbelZeit = WIRBEL_DAUER;
       funken.visible = true;
     },

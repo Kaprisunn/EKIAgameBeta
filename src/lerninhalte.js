@@ -3,10 +3,11 @@
 // zone:  verkauf = gelbes Shirt, logistik = blaues Shirt (Lager und Restaurant), buero = beide Farben
 // ort:   [x, z, blickrichtung] der Person bzw. Gefahrenstelle; knopf = anderer Interaktionspunkt
 // person: 'kunde' oder 'kollege' (rolle bestimmt die Kleidung), gefahr: 'pfuetze' oder 'karton'
+// typ:   auswahl (3 Antworten, Standard), timing (im richtigen Moment scannen), sortieren (Kartons tauschen)
 const P = Math.PI, R = Math.PI / 2;
 
-export const PUNKTE = { gruen: 10, gelb: 20, rot: 30 };
-export const ART = { rot: { zeichen: '❗', name: 'Notfall' }, gelb: { zeichen: '🤝', name: 'Kollegenhilfe' }, gruen: { zeichen: '✅', name: 'Aufgabe' } };
+export const PUNKTE = { gruen: 10, gelb: 20, rot: 30, kunde: 10 };
+export const ART = { rot: { zeichen: '❗', name: 'Notfall' }, gelb: { zeichen: '🤝', name: 'Kollegenhilfe' }, gruen: { zeichen: '✅', name: 'Aufgabe' }, kunde: { zeichen: '❓', name: 'Kundenfrage' } };
 
 export const MISSIONEN = [
   {
@@ -30,14 +31,13 @@ export const MISSIONEN = [
     tipp: 'Was passiert, wenn der Kunde zu Hause merkt, dass ein Teil fehlt?',
   },
   {
-    id: 'paletten', art: 'gruen', zone: 'logistik', etage: 'eg', person: 'kollege', rolle: 'logistik', ort: [27.6, -8.25, R],
-    titel: 'Paletten-Sicherheit', bereich: 'Logistik',
-    text: 'Eine Palette wird neu gepackt. Schwere und leichte Kartons stehen durcheinander, einer steht im Fluchtweg.',
-    frage: 'Wie packst du richtig?',
-    antworten: ['Schwere Kartons nach unten, leichte nach oben, Fluchtweg freiräumen.', 'Leichte Kartons unten, schwere oben, damit man sie gut greift.', 'Egal wie, Hauptsache schnell. Den Fluchtweg räumen wir später.'],
-    richtig: 0,
-    warum: 'Schwer unten macht die Palette stabil. Ein freier Fluchtweg kann im Notfall Leben retten.',
-    tipp: 'Denk an einen Turm aus Bauklötzen: Was muss unten liegen, damit er nicht kippt?',
+    id: 'paletten', art: 'gruen', zone: 'logistik', etage: 'eg', person: 'kollege', rolle: 'logistik', ort: [27.6, -8.25, R], typ: 'sortieren',
+    titel: 'Regal-Sicherheit', bereich: 'Logistik',
+    text: 'Ein Regal ist falsch eingeräumt: Schwere Kartons stehen oben, leichte unten.',
+    frage: 'Tippe zwei Kartons an, um sie zu tauschen. Schwer nach unten, leicht nach oben!',
+    kisten: [['Kommode', 25], ['Kissen', 2], ['Regal', 18], ['Lampe', 4]],
+    warum: 'Schwer unten macht Regal und Palette stabil, nichts kippt und niemand muss schwer über Kopf heben. Fluchtwege bleiben immer frei.',
+    tipp: 'Der schwerste Karton gehört ganz nach unten, der leichteste ganz nach oben.',
   },
   {
     id: 'frische', art: 'gruen', zone: 'logistik', etage: 'og', person: 'kollege', rolle: 'gastro', ort: [21, -19.9, 0],
@@ -60,7 +60,7 @@ export const MISSIONEN = [
     tipp: 'Welche Muskeln sind stärker: die im Rücken oder die in den Beinen?',
   },
   {
-    id: 'stau', art: 'gelb', zone: 'buero', etage: 'og', person: 'kollege', rolle: 'buero', ort: [18.5, 15, 0],
+    id: 'stau', art: 'gelb', zone: 'buero', etage: 'og', person: 'kollege', rolle: 'pc', ort: [18.5, 15, 0],
     titel: 'Kassen-Stau', bereich: 'Großraumbüro',
     text: 'Der Funk meldet lange Schlangen an den Kassen. In der Markthalle ist gerade wenig los.',
     frage: 'Wie koordinierst du?',
@@ -108,5 +108,13 @@ export const MISSIONEN = [
     richtig: 0,
     warum: 'Rollende Wagen können Autos und Menschen treffen. Stoppen und in der Box sichern verhindert Unfälle.',
     tipp: 'Wo stehen Einkaufswagen sicher und rollen nicht weg?',
+  },
+  {
+    id: 'diebstahl', art: 'gruen', zone: 'verkauf', etage: 'eg', person: 'kunde', ort: [12, 17.6, 0], typ: 'timing',
+    titel: 'Teppich unterm Wagen', bereich: 'Kasse / Ausgang',
+    text: 'Ein Kunde schiebt seinen Wagen zum Ausgang. Unten im Wagen liegt ein Teppich, der nicht gescannt wurde.',
+    frage: 'Tippe auf „Scannen!“ (oder Leertaste), wenn der rote Laser im grünen Feld steht.',
+    warum: 'Freundlich ansprechen und nachscannen statt beschuldigen: Oft ist es nur ein Versehen, und die Ware wird bezahlt.',
+    tipp: 'Warte, bis der Laser genau im grünen Feld steht.',
   },
 ];

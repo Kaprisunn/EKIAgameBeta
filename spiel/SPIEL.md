@@ -212,3 +212,25 @@ schneeweißem Haar, Männer mit weißem Vollbart). Alle gleich schnell und stark
 - Die Mission „Wagen rollen weg“ liegt bis zum Parkplatz am Ausgang im Erdgeschoss. 🔶
 - Symbole sind über Wände hinweg sichtbar, damit man sie findet. Es sind alle 10 Missionen gleichzeitig aktiv. 🔶
 - Die Logistik-Schranke öffnet sich mit dem blauen Shirt (früher: Rolle Logistik).
+
+---
+
+## 9. MASTER-SPEZIFIKATION V2 (November 2026)
+Ursprünglich als eigenständiges 2D-Canvas-Single-File-Spiel formuliert; umgesetzt im bestehenden 3D-Spiel (CLAUDE.md: Technik fest).
+
+### 9.1 Charakter-Editor & Kleiderordnung (strikt)
+- Start und Umkleide (Spinde EG/OG): Abteilung Verkauf, Logistik, Restaurant, ComIn, P&C; Aussehen Frau/Mann, Hautton (hell, mittel, dunkel),
+  jung oder erfahren 60+ (weißes Haar, Männer mit weißem Vollbart).
+- Verkauf: gelb/dunkelgelb gestreiftes Shirt. Logistik, Restaurant, ComIn (meist weibliche Figuren), P&C (Großraumbüro): blau/dunkelblau gestreift.
+- Kleiderordnung der Missionen: gelbe Zone = Verkauf, blaue Zone = alle blauen Abteilungen, Büro neutral, Rot gilt für alle.
+
+### 9.2 Warnweste
+Logistik nur mit Warnweste: Ohne Weste bleibt die Schranke zu, die Figur wird aufgehalten und eine Tafel „Halt! Sicherheit geht vor.“
+bietet [Weste anlegen]. Danach trägt die Figur eine leuchtend gelbe Weste mit Reflexstreifen und darf passieren.
+🔶 Die Weste gilt für die Schicht und muss nach einem Abteilungswechsel neu angelegt werden.
+
+### 9.3 Minispiele statt reinem Quiz
+1. Diebstahl-Prävention (Kasse/Ausgang): Timing-Balken, im richtigen Moment den Teppich unter dem Wagen scannen.
+2. Regal-Sicherheit (Logistik): Kartons tauschen, bis schwere unten und leichte oben stehen.
+3. Kund:innen mit ❓ folgen dem Spieler kurz; „Helfen“ stellt eine Frage passend zur eigenen Abteilung (src/kundenhilfe.js).
+4. Wagen-Rallye (Parkplatz): 5 Einkaufswagen in 30 Sekunden einsammeln (kommt mit dem Parkplatz).

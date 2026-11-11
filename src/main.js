@@ -1,19 +1,24 @@
-// Einstieg: Renderer, Szene, Spielschleife mit Zuständen, Etagenwechsel, Kleiderordnung, Missionen,
-// Leistungsanpassung und Fehleranzeige.
+// Einstieg: Renderer, Szene, Spielschleife mit Zuständen, Etagenwechsel, Charakter-Profil (Abteilung, Aussehen,
+// Warnweste), Missionen mit Minispielen, Kundenfragen, Leistungsanpassung und Fehleranzeige.
 import * as THREE from 'three';
 import { erstelleWelt } from './welt.js';
-import { erstelleSpieler } from './spieler.js';
+import { erstelleSpieler, steckbriefAus } from './spieler.js';
 import { erstelleKamera } from './kamera.js';
 import { erstelleEingabe } from './eingabe.js';
 import { erstelleUI } from './ui.js';
 import { erstelleInteraktion } from './interaktion.js';
 import { erstelleLeute } from './npc.js';
 import { erstelleMissionen } from './missionen.js';
+import { erstelleKundenfragen } from './kundenfragen.js';
+import { erstelleEditor } from './editor.js';
+import { weste } from './minispiele.js';
+import { ABTEILUNGEN } from './daten.js';
 import { erstelleZustand, Z, speicher } from './zustand.js';
 import { ton } from './audio.js';
 
 const zeigeFehler = window.__zeigeFehler || ((e) => console.error(e));
-const SHIRT_TEXT = { gelb: 'Gelb: Verkauf, Kasse, Service und Fundgrube', blau: 'Blau: Logistik und Restaurant' };
+const STANDARD = { abteilung: 'verkauf', geschlecht: 'w', haut: 'mittel', alter: 'jung' };
+const BREIT = () => window.innerWidth >= 1000; // Menü steht links, Figur rechts daneben
 
 function starte() {
   const renderer = new THREE.WebGLRenderer({ antialias: true, powerPreference: 'high-performance' });
@@ -29,21 +34,35 @@ function starte() {
 
   const szene = new THREE.Scene();
   const welt = erstelleWelt(szene);
-  // Kleiderordnung: gelbes oder blaues Shirt (gespeichert). Blau öffnet auch die Logistik-Schranke.
-  let shirt = speicher.laden('shirt', 'gelb');
-  const spieler = erstelleSpieler(szene, welt, shirt);
+  // Profil: Abteilung (bestimmt das Streifen-Shirt) und Aussehen, gespeichert. Die Warnweste gilt pro Schicht.
+  const profil = { ...STANDARD, ...speicher.laden('profil', {}), weste: false };
+  const shirt = () => ABTEILUNGEN[profil.abteilung].shirt;
+  const spieler = erstelleSpieler(szene, welt, steckbriefAus(profil));
   const leute = erstelleLeute(welt);
   const kam = erstelleKamera();
   const zustand = erstelleZustand();
   let neuZeichnen = true, tafelOffen = false;
 
-  const hud = () => ui.hud({ def: welt.etage.def, shirt, punkte: missionen.punkte, erledigt: missionen.erledigt, gesamt: missionen.gesamt });
-  function setzeShirt(farbe) {
-    shirt = farbe;
-    speicher.speichern('shirt', shirt);
-    spieler.setzeShirt(shirt);
-    ui.wahl(shirt);
+  const hud = () => ui.hud({ def: welt.etage.def, shirt: shirt(), abteilung: ABTEILUNGEN[profil.abteilung].name,
+    punkte: missionen.punkte, erledigt: missionen.erledigt, gesamt: missionen.gesamt });
+  function kleiden(effekt = true) {
+    spieler.setze(steckbriefAus(profil), effekt);
+    const { weste: _, ...gespeichert } = profil;
+    speicher.speichern('profil', gespeichert);
     hud();
+  }
+  // Warnweste: Ohne Weste bleibt die Logistik-Schranke zu; die Tafel bietet die Weste an
+  function warnweste() {
+    tafelOffen = true;
+    const m = { art: 'rot', ueberschrift: '🦺 Halt! Sicherheit geht vor.', bereich: 'Logistik',
+      text: 'Im Lager fahren Stapler, und es wird schwer gehoben. Ohne Warnweste kein Zutritt!',
+      frage: 'Warnweste anziehen?', abbrechen: () => ui.schliesse() };
+    ui.tafel(m, (box, melde) => weste(box, m, () => {
+      profil.weste = true;
+      kleiden();
+      ton.wechsel();
+      melde({ richtig: true, text: 'Weste an! Jetzt sehen dich Staplerfahrer:innen sofort. Die Schranke öffnet sich.' });
+    }), () => { tafelOffen = false; });
   }
   // Etagenwechsel mit kurzer Überblendung; die Figur landet am Ankunftspunkt der Ziel-Etage
   function wechsleEtage(p) {
@@ -64,13 +83,19 @@ function starte() {
   const interaktion = erstelleInteraktion({
     treppe: wechsleEtage,
     aufzug: (p) => { ton.ding(); wechsleEtage(p); },
-    schranke: () => { if (shirt !== 'blau') ui.toast('Nur für Logistik: Mit gelbem Shirt kein Zutritt. Am Spind kannst du dich umziehen.'); },
-    spind: () => { setzeShirt(shirt === 'gelb' ? 'blau' : 'gelb'); ton.wechsel(); ui.toast(`Umgezogen! ${SHIRT_TEXT[shirt]}.`); },
-    mission: (p) => { if (missionen.starte(p.mission, shirt, missionFertig)) tafelOffen = true; },
+    schranke: () => { if (!profil.weste) warnweste(); },
+    spind: () => {
+      tafelOffen = true;
+      if (BREIT()) kam.seitlich(-4.5);
+      ui.umkleide(() => { tafelOffen = false; kam.seitlich(0); ui.toast(`Umgezogen: ${ABTEILUNGEN[profil.abteilung].name}.`); });
+    },
+    mission: (p) => { if (missionen.starte(p.mission, shirt(), missionFertig)) tafelOffen = true; },
+    kunde: (p) => { tafelOffen = true; kundenfragen.starte(p, profil.abteilung, () => { tafelOffen = false; hud(); }); },
   });
 
   const aktion = () => {
-    if (zustand.get() !== Z.SPIEL || tafelOffen) return;
+    if (zustand.get() !== Z.SPIEL) return;
+    if (tafelOffen) { ui.taste(); return; }
     if (interaktion.nah) interaktion.ausloesen();
     else { spieler.winken(); leute.winken(spieler.pos); }
   };
@@ -83,18 +108,23 @@ function starte() {
     weiter: () => zustand.setze(Z.SPIEL),
     pause: umschaltenPause,
     aktion,
-    shirt: setzeShirt,
     zuruecksetzen: () => { missionen.zuruecksetzen(); hud(); ui.toast('Alle Missionen sind wieder offen.'); },
   });
   const missionen = erstelleMissionen({ welt, leute, ui });
+  const kundenfragen = erstelleKundenfragen({ welt, leute, ui, missionen });
+  // Neue Abteilung = neue Kleidung, die Warnweste muss dann neu angelegt werden
+  erstelleEditor(document.getElementById('editor'), profil, (feld) => {
+    if (feld === 'abteilung') profil.weste = false;
+    kleiden(zustand.get() === Z.SPIEL);
+  });
   const eingabe = erstelleEingabe({
     aktion,
     pause: umschaltenPause,
     start: () => { if (zustand.get() === Z.MENUE) zustand.setze(Z.SPIEL); },
   });
-  zustand.beiWechsel((neu) => { ui.zeige(neu); eingabe.zuruecksetzen(); neuZeichnen = true; });
+  zustand.beiWechsel((neu) => { ui.zeige(neu); eingabe.zuruecksetzen(); neuZeichnen = true; if (neu === Z.SPIEL && !tafelOffen) kam.seitlich(0); });
   ui.zeige(Z.MENUE);
-  ui.wahl(shirt);
+  if (BREIT()) kam.seitlich(-4.5);
   hud();
   document.addEventListener('visibilitychange', () => { if (document.hidden && zustand.get() === Z.SPIEL) zustand.setze(Z.PAUSE); });
 
@@ -113,8 +143,11 @@ function starte() {
   // Testhilfe für tools/check.mjs und Fehlersuche
   window.__test = {
     etage: (id, x = -20, z = 18.5) => { welt.zeige(id); spieler.teleport(x, z); kam.folge(spieler.pos, spieler.tempo, 0, true); hud(); },
-    shirt: setzeShirt,
-    mission: (id) => missionen.starte(id, shirt, missionFertig) && (tafelOffen = true),
+    profil: (p) => { Object.assign(profil, p); kleiden(false); },
+    weste: warnweste,
+    fragende: () => leute.fragende(welt.etage.id).length,
+    pos: () => [Math.round(spieler.pos.x * 10) / 10, Math.round(spieler.pos.z * 10) / 10],
+    mission: (id) => missionen.starte(id, shirt(), missionFertig) && (tafelOffen = true),
   };
   let letzte = performance.now(), messZeit = 0, messBilder = 0;
 
@@ -141,7 +174,8 @@ function starte() {
         spieler.update(dt, eingabe.richtung(), z === Z.SPIEL && !tafelOffen);
         leute.update(dt, welt.etage.id, spieler.pos);
         leute.schiebeSpieler(spieler.pos);
-        welt.update(dt, spieler.pos, shirt === 'blau' ? 'logistik' : 'verkauf');
+        kundenfragen.update(dt, welt.etage.id);
+        welt.update(dt, spieler.pos, profil.weste ? 'logistik' : 'ohneWeste');
         const funk = missionen.update(dt, welt.etage.id);
         if (z === Z.SPIEL) {
           ui.aktion(tafelOffen ? null : interaktion.update(welt.etage.punkte, spieler.pos));

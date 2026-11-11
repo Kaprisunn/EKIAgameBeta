@@ -6,7 +6,7 @@ export function erstelleKamera() {
   const kamera = new THREE.PerspectiveCamera(35, 1, 0.5, 400);
   const versatz = new THREE.Vector3(0, 10.5, 12.5);
   const blick = new THREE.Vector3(), ziel = new THREE.Vector3(), voraus = new THREE.Vector3();
-  let zoom = 1;
+  let zoom = 1, seite = 0, seiteZiel = 0;
 
   return {
     kamera,
@@ -16,8 +16,11 @@ export function erstelleKamera() {
       kamera.updateProjectionMatrix();
     },
     // pos: Spielerposition, tempo: Geschwindigkeitsvektor; sofort = ohne Glätten springen
+    // Seitlicher Versatz, z. B. damit die Figur neben dem Menü sichtbar bleibt
+    seitlich(x) { seiteZiel = x; },
     folge(pos, tempo, dt, sofort = false) {
-      voraus.set(tempo.x * 0.3, 0, tempo.z * 0.25);
+      seite = sofort ? seiteZiel : seite + (seiteZiel - seite) * (1 - Math.exp(-4 * dt));
+      voraus.set(tempo.x * 0.3 + seite, 0, tempo.z * 0.25);
       ziel.copy(pos).add(voraus);
       ziel.y = 1.2;
       blick.lerp(ziel, sofort ? 1 : 1 - Math.exp(-4 * dt));

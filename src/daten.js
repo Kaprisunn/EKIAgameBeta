@@ -24,6 +24,19 @@ export const FIGUREN = {
   },
 };
 
+// Abteilungen bestimmen die Kleidung: Verkauf gelb/dunkelgelb gestreift, alle anderen blau/dunkelblau gestreift
+export const ABTEILUNGEN = {
+  verkauf: { name: 'Verkauf', shirt: 'gelb' }, logistik: { name: 'Logistik', shirt: 'blau' },
+  restaurant: { name: 'Restaurant', shirt: 'blau' }, comin: { name: 'ComIn', shirt: 'blau' }, pc: { name: 'P&C', shirt: 'blau' },
+};
+export const SHIRTS = {
+  gelb: { shirt: 0xfbd914, streifen: 0xd9a400, schild: 0x0058ab },
+  blau: { shirt: 0x0058ab, streifen: 0x003a75, schild: 0xfbd914 },
+};
+export const HAUTTOENE = { hell: 0xf2c29b, mittel: 0xd6a06c, dunkel: 0x7a4f30 };
+export const HAARE_JUNG = { hell: 0x6b4a2f, mittel: 0x2e2522, dunkel: 0x1a1a1a };
+export const WESTE = { grund: 0xd4f01c, reflex: 0xdfe3e8 };
+
 export const HALLE = { breite: 64, tiefe: 44, wandHoehe: 4.5, wandDicke: 0.5 };
 export const START = { x: -20, z: 18.5 }; // am Eingang im Erdgeschoss
 export const SPIELER = { tempo: 6.5, radius: 0.55 };

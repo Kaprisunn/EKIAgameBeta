@@ -18,16 +18,29 @@ const HOSEN = [0x4a5a78, 0x3a3f47, 0x8c7a5b, 0x2b3550];
 const RADIUS = 0.4, ABSTAND = 0.95, BLASE_ZEIT = 2.8;
 const FLECK = new THREE.MeshBasicMaterial({ color: 0x1f2a36, transparent: true, opacity: 0.2, depthWrite: false });
 
-// Kleiderordnung: Verkauf gelb, Logistik und Restaurant blau (Restaurant mit Schürze), Büro gemischt
+// Kleiderordnung: Verkauf gelb gestreift, alle anderen Abteilungen blau gestreift (Restaurant mit Schürze,
+// Logistik mit Warnweste, ComIn meist mit langen Haaren). Kund:innen in Freizeitkleidung, Ältere teils mit Bart.
 function steckbrief(kollege, rolle) {
-  const shirt = !kollege ? zufall(OBERTEILE) : rolle === 'verkauf' ? FARBE.gelb : rolle === 'buero' ? zufall([FARBE.gelb, FARBE.blau]) : FARBE.blau;
+  const blau = rolle !== 'verkauf', shirt = !kollege ? zufall(OBERTEILE) : blau ? FARBE.blau : FARBE.gelb;
+  const haare = zufall(HAARE), frisur = kollege && rolle === 'comin' ? zufall(['zopf', 'dutt', 'zopf', 'kurz']) : zufall(FRISUREN);
   return {
-    haut: zufall(HAUT), haare: zufall(HAARE), frisur: zufall(FRISUREN), shirt, schuhe: FARBE.umriss,
+    haut: zufall(HAUT), haare, frisur, shirt, schuhe: FARBE.umriss,
+    streifen: kollege ? (blau ? 0x003a75 : 0xd9a400) : null,
     hose: kollege ? (rolle === 'logistik' ? 0x1e2f55 : 0x2b2b30) : zufall(HOSEN),
-    schild: kollege ? (shirt === FARBE.gelb ? FARBE.blau : FARBE.gelb) : null, schuerze: kollege && rolle === 'gastro',
+    schild: kollege ? (blau ? FARBE.gelb : FARBE.blau) : null, schuerze: kollege && rolle === 'gastro', weste: kollege && rolle === 'logistik',
+    bart: haare === 0x9a9a9a && (frisur === 'kurz' || frisur === 'glatze') && Math.random() < 0.6,
     tasche: !kollege && Math.random() < 0.5 ? zufall([FARBE.gelb, FARBE.blau]) : null,
     groesse: 0.9 + Math.random() * 0.14, umriss: false, einfach: true,
   };
+}
+
+// Kund:in mit Frage folgt dem Spieler kurz (höchstens 10 s) und bleibt in 1,6 Einheiten Abstand stehen
+function folge(n, dt, sp) {
+  const d = Math.hypot(n.pos.x - sp.x, n.pos.z - sp.z);
+  if (d > 9) n.folgen = 0;
+  if (d > 6 || n.folgen > 10) return;
+  n.folgen += dt;
+  if (d > 1.6) { n.ziel = [sp.x, sp.z]; n.warte = 0; } else { n.warte = 0.3; n.dreh = Math.atan2(sp.x - n.pos.x, sp.z - n.pos.z); }
 }
 
 function person(gruppe, typ, x, z, dreh, rolle = 'verkauf') {
@@ -36,7 +49,7 @@ function person(gruppe, typ, x, z, dreh, rolle = 'verkauf') {
   f.wurzel.rotation.y = dreh;
   gruppe.add(f.wurzel);
   return { f, typ, rolle, pos: f.wurzel.position, dreh, dreh0: dreh, anim: neueAnimation(), warte: Math.random() * 3,
-    tempo: 2 + Math.random() * 1.2, pruef: 0, rest: Infinity, blaseIn: Math.random() * 6, winkIn: 0 };
+    tempo: 2 + Math.random() * 1.2, pruef: 0, rest: Infinity, blaseIn: Math.random() * 6, winkIn: 0, folgen: 0 };
 }
 
 // Kolleg:in am Schreibtisch: Hüfte auf Stuhlhöhe, Beine nach vorn, Hände tippen
@@ -80,7 +93,7 @@ export function erstelleLeute(welt) {
     const flecken = new THREE.InstancedMesh(new THREE.CircleGeometry(0.5, 14).rotateX(-Math.PI / 2), FLECK, liste.length);
     flecken.frustumCulled = false;
     gruppe.add(flecken);
-    etagen[id] = { liste, d, flecken };
+    etagen[id] = { liste, d, flecken, fragerIn: 2 };
   }
 
   const m = new THREE.Matrix4();
@@ -132,7 +145,14 @@ export function erstelleLeute(welt) {
       const e = etagen[id];
       if (!e) return;
       aktiv = e;
+      // Höchstens zwei Kund:innen je Etage haben eine Frage (Symbol und Interaktion: kundenfragen.js)
+      if ((e.fragerIn -= dt) <= 0) {
+        e.fragerIn = 15;
+        const frei = e.liste.filter((n) => n.typ === 'kunde' && !n.steht && !n.mission && !n.frage);
+        if (e.liste.filter((n) => n.frage).length < 2 && frei.length) zufall(frei).frage = true;
+      }
       e.liste.forEach((n, i) => {
+        if (n.frage) folge(n, dt, spieler);
         const v = n.typ === 'kollege' || n.steht ? 0 : bewege(n, dt, e.d, spieler);
         let dd = n.dreh - n.f.wurzel.rotation.y;
         dd = Math.atan2(Math.sin(dd), Math.cos(dd));
@@ -169,6 +189,14 @@ export function erstelleLeute(welt) {
       }
     },
     missionsPerson: (id) => missionsLeute[id] ?? null,
+    fragende: (id) => etagen[id]?.liste.filter((n) => n.frage) ?? [],
+    // Nach der Hilfe: Symbol weg, Dank in der Sprechblase, weiterbummeln
+    bedanke(n) {
+      n.frage = false;
+      n.folgen = 0;
+      n.warte = 1;
+      if (aktiv) { n.ziel = zufall(aktiv.d.wege); blase = { n, e: aktiv, zeit: BLASE_ZEIT, text: 'Danke, super Hilfe!' }; }
+    },
     // Stehende und sitzende Personen sind feste Hindernisse für den Spieler
     schiebeSpieler(p) {
       for (const n of aktiv?.liste ?? []) {
