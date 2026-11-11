@@ -105,6 +105,7 @@ export function erstelleMissionen({ welt, leute, ui }) {
     gesamt: MISSIONEN.length,
     get punkte() { return stand.punkte; },
     get erledigt() { return stand.erledigt.length; },
+    get erledigteIds() { return stand.erledigt; },
     // Prüft zuerst „Notfall?“, dann die Shirt-Farbe, und öffnet die Frage-Tafel. fertig() nach dem Schließen.
     starte(id, shirt, fertig) {
       const e = eintraege.find((x) => x.m.id === id);

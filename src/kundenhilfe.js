@@ -44,3 +44,20 @@ export const HILFE = {
       'Ein guter erster Tag mit klarer Begleitung hilft neuen Kolleg:innen, schnell anzukommen.', 'Was hilft dir an deinem ersten Arbeitstag?'),
   ],
 };
+
+// Fragen auf Englisch (in Kaiserslautern kaufen viele US-Familien ein). Antworten auf Englisch, Erklärung auf Deutsch.
+const e = (titel, text, antworten, richtig, warum, tipp) => ({ ...f(`🇺🇸 ${titel}`, text, 'Was antwortest du?', antworten, richtig, warum, tipp), bereich: 'Kundenfrage auf Englisch' });
+export const ENGLISCH = [
+  e('Meatballs', '„Excuse me, where can I find the meatballs?“',
+    ['„Nix verstehen, sorry.“', '„Upstairs in the restaurant. Take the stairs or the elevator over there.“', '„Go outside to the parking lot.“'], 1,
+    'Kurz und freundlich auf Englisch antworten und den Weg zeigen: So fühlen sich auch englischsprachige Kund:innen willkommen.', 'Wo gibt es Köttbullar? Und wie heißt „oben“ auf Englisch?'),
+  e('Too big for the car', '„This box is too big for my car. What can I do?“',
+    ['„You can fold down the back seats, or ask customer service about delivery.“', '„Not my problem.“', '„Just put it on the roof.“'], 0,
+    'Auf Englisch dieselbe gute Lösung anbieten wie auf Deutsch: Sitze umklappen, Lieferservice, Kundenservice.', 'Welche Lösungen kennst du schon aus der Mission „Transportproblem“?'),
+  e('Restrooms', '„Excuse me, where are the restrooms?“',
+    ['„No idea.“', '„Ask somebody else.“', '„Let me show you the way. Follow me, please.“'], 2,
+    '„Follow me, please“ ist höflich und hilft sofort, auch wenn man den Weg schwer erklären kann.', 'Wie hilfst du, wenn ein Weg schwer zu erklären ist?'),
+  e('Lamp in white', '„Do you have this lamp in white?“',
+    ['„No.“', '„Let me check that for you.“', '„Paint it yourself.“'], 1,
+    'Erst nachsehen, dann antworten: So bekommt der Kunde eine verlässliche Auskunft.', 'Was solltest du tun, bevor du „nein“ sagst?'),
+];

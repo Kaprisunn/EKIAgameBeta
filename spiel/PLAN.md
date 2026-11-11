@@ -37,11 +37,14 @@ Sperre gegen Flackern). Wagen-Rallye (rallye.js): 5 Wagen in 30 s einsammeln, si
 jetzt 14 Missionen. Schicht von 6 Minuten mit Uhr im HUD, Schichtbericht (Sterne, Werte, Lerntipp; auch über das Pausenmenü).
 Figur: Ohren, Augenbrauen, schwarze Schuhe mit roter Sohle, Cargo-Tasche für Logistik. Hochformat: kleinere Tafeln und HUD.
 
-## Nach M8: Vorschläge (Plan ist abgeschlossen)
+### M9 – Abzeichen, Pausenraum-Quiz & Englisch ✅
+(9.5) abzeichen.js (8 Abzeichen, Meldung bei neuer Stufe), quiz.js (Pausenraum, 3 Fragen pro Schicht), englischsprachige
+Kundenfragen, Pausenraum mit Espresso-Station, Hinweise in einer Warteschlange, Renderer in renderer.js ausgelagert.
+
+## Vorschläge für danach
 - Leistung auf dem iPad prüfen (Rückmeldung von dir) und bei Bedarf Details sparen.
-- Lerntexte mit dem Team prüfen; weitere Fälle einfach in lerninhalte.js und kundenhilfe.js ergänzen.
-- Abzeichen pro Bereich (Bronze/Silber/Gold), freiwilliges Wissens-Quiz im Pausenraum.
-- Englischsprachige Kund:innen (z. B. US-Kund:innen aus Kaiserslautern) als eigene Fragen.
+- Lerntexte mit dem Team prüfen; neue Fälle einfach in lerninhalte.js und kundenhilfe.js ergänzen.
+- main.js (ca. 240 Zeilen) und blaster.js (ca. 255 Zeilen) bei Gelegenheit aufteilen.
 
 ## Später (zurückgestellt)
 Zwei Währungen, Pausenraum-Upgrades.

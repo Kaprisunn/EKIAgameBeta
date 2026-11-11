@@ -1,5 +1,5 @@
-// Einstieg: Renderer, Szene, Spielschleife mit Zuständen, Etagenwechsel, Charakter-Profil (Abteilung, Aussehen,
-// Warnweste), Missionen mit Minispielen, Kundenfragen, Leistungsanpassung und Fehleranzeige.
+// Einstieg: Szene, Spielschleife mit Zuständen, Ebenenwechsel, Charakter-Profil (Abteilung, Aussehen, Warnweste),
+// Missionen mit Minispielen, Kundenfragen, Parkplatz-Action, Schicht, Abzeichen, Quiz und Fehleranzeige.
 import * as THREE from 'three';
 import { erstelleWelt } from './welt.js';
 import { erstelleSpieler, steckbriefAus } from './spieler.js';
@@ -13,6 +13,9 @@ import { erstelleKundenfragen } from './kundenfragen.js';
 import { erstelleRallye } from './rallye.js';
 import { erstelleBlaster } from './blaster.js';
 import { erstelleSchicht } from './schicht.js';
+import { erstelleAbzeichen } from './abzeichen.js';
+import { erstelleQuiz } from './quiz.js';
+import { erstelleRenderer } from './renderer.js';
 import { erstelleEditor } from './editor.js';
 import { weste } from './minispiele.js';
 import { ABTEILUNGEN } from './daten.js';
@@ -25,16 +28,7 @@ const STANDARD = { abteilung: 'verkauf', geschlecht: 'w', haut: 'mittel', alter:
 const BREIT = () => window.innerWidth >= 1000; // Menü steht links, Figur rechts daneben
 
 function starte() {
-  const renderer = new THREE.WebGLRenderer({ antialias: true, powerPreference: 'high-performance' });
-  const dpr = Math.min(window.devicePixelRatio || 1, 2);
-  const stufen = [2, 1.5, 1.25].map((s) => Math.min(s, dpr)).filter((s, i, a) => a.indexOf(s) === i);
-  let stufe = 0;
-  renderer.setPixelRatio(stufen[0]);
-  renderer.toneMapping = THREE.ACESFilmicToneMapping;
-  renderer.toneMappingExposure = 1.0;
-  renderer.shadowMap.enabled = true;
-  renderer.shadowMap.type = THREE.PCFShadowMap;
-  document.getElementById('spiel').appendChild(renderer.domElement);
+  const leistung = erstelleRenderer(document.getElementById('spiel')), renderer = leistung.renderer;
 
   const szene = new THREE.Scene();
   const welt = erstelleWelt(szene);
@@ -85,6 +79,7 @@ function starte() {
   }
   function missionFertig() {
     tafelOffen = false;
+    abzeichen.pruefe();
     hud();
     if (missionen.erledigt === missionen.gesamt) ui.toast('Alle Missionen geschafft! Starke Schicht! 🎉', 5000);
   }
@@ -102,6 +97,7 @@ function starte() {
     },
     mission: (p) => { if (missionen.starte(p.mission, shirt(), missionFertig)) tafelOffen = true; },
     kunde: (p) => { tafelOffen = true; kundenfragen.starte(p, profil.abteilung, () => { tafelOffen = false; hud(); }); },
+    quiz: () => { if (quiz.starte(() => { tafelOffen = false; hud(); })) tafelOffen = true; },
   });
 
   const aktion = () => {
@@ -111,6 +107,7 @@ function starte() {
     if (interaktion.nah) interaktion.ausloesen();
     else { spieler.winken(); leute.winken(spieler.pos); }
   };
+  const aktion2 = () => { if (zustand.get() === Z.SPIEL && blaster.aktiv && !tafelOffen) blaster.feuer('snack', spieler.pos, spieler.blick); };
   const umschaltenPause = () => {
     if (zustand.get() === Z.SPIEL) zustand.setze(Z.PAUSE);
     else if (zustand.get() === Z.PAUSE) zustand.setze(Z.SPIEL);
@@ -120,15 +117,17 @@ function starte() {
     weiter: () => zustand.setze(Z.SPIEL),
     pause: umschaltenPause,
     aktion,
-    aktion2: () => { if (zustand.get() === Z.SPIEL && blaster.aktiv && !tafelOffen) blaster.feuer('snack', spieler.pos, spieler.blick); },
-    zuruecksetzen: () => { missionen.zuruecksetzen(); schicht.neu(); hud(); ui.toast('Alle Missionen sind wieder offen.'); },
+    aktion2,
+    zuruecksetzen: () => { missionen.zuruecksetzen(); schicht.neu(); abzeichen.pruefe(); hud(); ui.abzeichen(abzeichen.liste()); ui.toast('Alle Missionen sind wieder offen.'); },
     beenden: () => zustand.setze(Z.ENDE),
-    neueSchicht: () => { schicht.neu(); hud(); zustand.setze(Z.SPIEL); ui.toast('Neue Schicht: 6 Minuten. Viel Erfolg!'); },
+    neueSchicht: () => { schicht.neu(); quiz.neueSchicht(); hud(); zustand.setze(Z.SPIEL); ui.toast('Neue Schicht: 6 Minuten. Viel Erfolg!'); },
   });
   const missionen = erstelleMissionen({ welt, leute, ui });
-  const kundenfragen = erstelleKundenfragen({ welt, leute, ui, missionen });
-  const rallye = erstelleRallye({ welt, ui, missionen });
-  const blaster = erstelleBlaster({ welt, ui, missionen });
+  const abzeichen = erstelleAbzeichen({ missionen, ui });
+  const kundenfragen = erstelleKundenfragen({ welt, leute, ui, missionen, abzeichen });
+  const rallye = erstelleRallye({ welt, ui, missionen, abzeichen });
+  const blaster = erstelleBlaster({ welt, ui, missionen, abzeichen });
+  const quiz = erstelleQuiz({ ui, missionen, abzeichen });
   const schicht = erstelleSchicht({ missionen });
   // Neue Abteilung = neue Kleidung, die Warnweste muss dann neu angelegt werden
   erstelleEditor(document.getElementById('editor'), profil, (feld) => {
@@ -137,11 +136,14 @@ function starte() {
   });
   const eingabe = erstelleEingabe({
     aktion,
-    aktion2: () => { if (zustand.get() === Z.SPIEL && blaster.aktiv && !tafelOffen) blaster.feuer('snack', spieler.pos, spieler.blick); },
+    aktion2,
     pause: umschaltenPause,
     start: () => { if (zustand.get() === Z.MENUE) zustand.setze(Z.SPIEL); },
   });
-  zustand.beiWechsel((neu) => { if (neu === Z.ENDE) ui.bericht(schicht.bericht()); ui.zeige(neu); eingabe.zuruecksetzen(); neuZeichnen = true; if (neu === Z.SPIEL && !tafelOffen) kam.seitlich(0); });
+  zustand.beiWechsel((neu) => {
+    if (neu === Z.ENDE) ui.bericht(schicht.bericht());
+    if (neu === Z.ENDE || neu === Z.PAUSE) ui.abzeichen(abzeichen.liste());
+    ui.zeige(neu); eingabe.zuruecksetzen(); neuZeichnen = true; if (neu === Z.SPIEL && !tafelOffen) kam.seitlich(0); });
   ui.zeige(Z.MENUE);
   if (BREIT()) kam.seitlich(-4.5);
   hud();
@@ -158,7 +160,7 @@ function starte() {
   groesse();
   kam.folge(spieler.pos, spieler.tempo, 0, true);
 
-  const info = (window.__info = { drawCalls: 0, dreiecke: 0, pixelRatio: stufen[0], zustand: Z.MENUE, etage: welt.etage.id });
+  const info = (window.__info = { drawCalls: 0, dreiecke: 0, pixelRatio: leistung.pixelRatio, zustand: Z.MENUE, etage: welt.etage.id });
   // Testhilfe für tools/check.mjs und Fehlersuche
   window.__test = {
     etage: (id, x = -20, z = 18.5) => { welt.zeige(id); spieler.teleport(x, z); kam.folge(spieler.pos, spieler.tempo, 0, true); hud(); },
@@ -170,8 +172,10 @@ function starte() {
     feuer: (art) => blaster.feuer(art, spieler.pos, spieler.blick),
     pos: () => [Math.round(spieler.pos.x * 10) / 10, Math.round(spieler.pos.z * 10) / 10],
     mission: (id) => missionen.starte(id, shirt(), missionFertig) && (tafelOffen = true),
+    quiz: () => quiz.starte(() => { tafelOffen = false; }) && (tafelOffen = true),
+    abzeichen: () => abzeichen.liste().map((a) => `${a.name}: ${a.stufe}`).join(', '),
   };
-  let letzte = performance.now(), messZeit = 0, messBilder = 0, letztePunkte = -1, letzteSekunde = -1;
+  let letzte = performance.now(), letztePunkte = -1, letzteSekunde = -1;
 
   // Sprechblase über dem Kopf: 3D-Punkt in Bildschirmkoordinaten umrechnen
   const kopf = new THREE.Vector3();
@@ -220,17 +224,7 @@ function starte() {
       info.drawCalls = renderer.info.render.calls;
       info.dreiecke = renderer.info.render.triangles;
 
-      // Leistung: nach je 2 s Spielzeit unter 45 Bildern/s das Pixelverhältnis stufenweise senken
-      if (z === Z.SPIEL && echt < 0.5) {
-        messZeit += echt; messBilder++;
-        if (messZeit > 2) {
-          if (messBilder / messZeit < 45 && stufe < stufen.length - 1) {
-            renderer.setPixelRatio(stufen[++stufe]);
-            info.pixelRatio = stufen[stufe];
-          }
-          messZeit = messBilder = 0;
-        }
-      }
+      if (z === Z.SPIEL) { leistung.messe(echt); info.pixelRatio = leistung.pixelRatio; }
     } catch (e) {
       renderer.setAnimationLoop(null);
       zeigeFehler(e);

@@ -1,4 +1,4 @@
-// Möbel fürs Obergeschoss: Showroom-Kojen, Restaurant, Umkleide, Großraumbüro.
+// Möbel fürs Obergeschoss: Showroom-Kojen, Restaurant, Umkleide, Großraumbüro, Pausenraum.
 // Wohnkojen: Ursprung = Kojenmitte, Rückwand bei z = -3.75. Format wie in moebel.js.
 import { quader, zylinder, kugel } from './formen.js';
 import { FARBE as F } from './daten.js';
@@ -96,4 +96,17 @@ export const MOEBEL_OG = {
     fuss: [[1.5, 1.5]],
   },
   schreibtische: { teile: schreibtische(), fuss: [[1.6, 1.8]], viele: true },
+  // Pausenraum: Espresso-Station und Quiz-Tafel
+  kaffee: {
+    teile: [[Q(1.6, 0.95, 0.7), F.birke, [0, 0.48, 0]], [Q(1.7, 0.06, 0.75), F.weiss, [0, 0.98, 0]], [Q(0.5, 0.6, 0.4), F.schwarz, [-0.35, 1.31, -0.1]],
+      [Q(0.3, 0.08, 0.1), F.metall, [-0.35, 1.2, 0.12]], [Z(0.05, 0.045, 0.1), F.weiss, [-0.35, 1.06, 0.12]],
+      [Z(0.05, 0.045, 0.1), F.gelb, [0.25, 1.06, 0.1]], [Z(0.05, 0.045, 0.1), F.blau, [0.45, 1.06, 0.15]]],
+    fuss: [[1.7, 0.75]],
+  },
+  quiztafel: {
+    teile: [[Q(2.2, 1.2, 0.06), F.weiss, [0, 1.2, 0]], [Q(2.3, 0.08, 0.1), F.dunkelgrau, [0, 0.57, 0.02]],
+      [Z(0.04, 0.04, 1.8, 6), F.dunkelgrau, [-1.05, 0.9, 0]], [Z(0.04, 0.04, 1.8, 6), F.dunkelgrau, [1.05, 0.9, 0]],
+      [Q(0.28, 0.28, 0.02), F.gelb, [-0.75, 1.05, 0.04]], [Q(0.28, 0.28, 0.02), F.decke, [0.75, 1.05, 0.04]]],
+    fuss: [[2.3, 0.4]],
+  },
 };

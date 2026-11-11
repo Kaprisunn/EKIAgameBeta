@@ -3,6 +3,7 @@
 import { Z, speicher } from './zustand.js';
 import { ton } from './audio.js';
 import { ART } from './lerninhalte.js';
+import { STUFEN } from './abzeichen.js';
 
 const $ = (id) => document.getElementById(id);
 const AKTION = { rot: ['❗', 'Notfall'], gelb: ['🤝', 'Helfen'], gruen: ['✅', 'Aufgabe'] };
@@ -46,11 +47,20 @@ export function erstelleUI({ start, weiter, pause, aktion, aktion2, zuruecksetze
     zuruecksetzen();
   });
 
+  // Hinweise nacheinander zeigen (höchstens zwei warten, gleiche Texte nur einmal)
+  const schlange = [];
+  function naechsterToast() {
+    const n = schlange.shift();
+    el.toast.hidden = !n;
+    if (!n) { toastUhr = 0; return; }
+    el.toast.textContent = n[0];
+    toastUhr = setTimeout(naechsterToast, n[1]);
+  }
   function toast(text, ms = 3200) {
-    el.toast.textContent = text;
-    el.toast.hidden = false;
-    clearTimeout(toastUhr);
-    toastUhr = setTimeout(() => { el.toast.hidden = true; }, ms);
+    if (schlange.some(([t]) => t === text) || (toastUhr && el.toast.textContent === text)) return;
+    if (schlange.length >= 2) schlange.shift();
+    schlange.push([text, ms]);
+    if (!toastUhr) naechsterToast();
   }
   function schliesse() {
     el.dialog.hidden = true;
@@ -99,6 +109,18 @@ export function erstelleUI({ start, weiter, pause, aktion, aktion2, zuruecksetze
       symbol.textContent = '👕';
       el.hud.replaceChildren(symbol, ` ${abteilung} · ${def.kurz}   ⭐ ${punkte}   ✔ ${erledigt}/${gesamt}   ⏱ ${uhr}`);
     },
+    // Abzeichen-Liste im Pausenmenü und im Schichtbericht
+    abzeichen(liste) {
+      const karten = () => liste.map((a) => {
+        const d = document.createElement('div'), klein = document.createElement('small');
+        d.className = 'stufe' + a.stufe;
+        klein.textContent = `${STUFEN[a.stufe]} · ${a.info}`;
+        d.append(`${a.zeichen} ${a.name}`, klein);
+        return d;
+      });
+      $('pAbzeichen').replaceChildren(...karten());
+      $('bAbzeichen').replaceChildren(...karten());
+    },
     // Schichtbericht: Sterne, Werte dieser Schicht und ein Lerntipp
     bericht({ punkte, erledigt, sterne, tipp, offen }) {
       el.bSterne.textContent = '⭐'.repeat(sterne) + '☆'.repeat(3 - sterne);
@@ -123,7 +145,7 @@ export function erstelleUI({ start, weiter, pause, aktion, aktion2, zuruecksetze
       if (art === aktionArt) return;
       aktionArt = art;
       const [symbol, text] = !p ? ['👋', ''] : p.art === 'aufzug' ? [p.ziel === 'og' ? '⬆️' : '⬇️', 'Aufzug']
-        : p.art === 'spind' ? ['👕', 'Umkleide'] : p.art === 'kunde' ? ['❓', 'Helfen'] : p.art === 'rallye' ? ['🛒', 'Rallye'] : p.art === 'blaster' ? ['🎯', 'Blaster'] : p.art === 'feuer' ? ['📡', 'Ring'] : p.art === 'mission' ? AKTION[p.farbe] : ['❗', ''];
+        : p.art === 'spind' ? ['👕', 'Umkleide'] : p.art === 'kunde' ? ['❓', 'Helfen'] : p.art === 'rallye' ? ['🛒', 'Rallye'] : p.art === 'blaster' ? ['🎯', 'Blaster'] : p.art === 'quiz' ? ['🧠', 'Quiz'] : p.art === 'feuer' ? ['📡', 'Ring'] : p.art === 'mission' ? AKTION[p.farbe] : ['❗', ''];
       el.aktion.textContent = symbol;
       el.aktion.setAttribute('aria-label', text || 'Winken');
       el.aktionText.textContent = text;

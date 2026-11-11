@@ -25,7 +25,7 @@ export const LEUTE = {
     kollegen: [
       [-10, -12.5, 0, 'steht', 'verkauf'], [24, -19.9, 0, 'steht', 'gastro'], [28.8, -4, -R, 'steht', 'gastro'],
       [6, 18.25, P, 'sitzt', 'pc'], [11, 15.75, 0, 'sitzt', 'pc'], [21, 18.25, P, 'sitzt', 'pc'],
-      [26, 15.75, 0, 'sitzt', 'pc'], [-15.5, 16.8, P, 'steht', 'pc'], [-6.2, -15.6, P, 'steht', 'comin'],
+      [26, 15.75, 0, 'sitzt', 'pc'], [-15.5, 16.8, P, 'steht', 'pc'], [-6.2, -15.6, P, 'steht', 'comin'], [-4.42, 18.05, P, 'sitzt', 'verkauf'],
     ],
     laeufer: [],
   },
