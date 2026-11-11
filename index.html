@@ -83,11 +83,29 @@ body {
 #dRueck { padding: 12px 16px; border-radius: 16px; }
 #dRueck.ok { background: #e3f6e8; color: #17532a; } #dRueck.falsch { background: #fff4d6; color: #6b4b00; }
 body.dialog #aktion, body.dialog #aktionText, body.dialog #joyzone { display: none !important; }
-.wahl { display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; }
-.chip { min-height: 64px; padding: 0 18px; border: 3px solid var(--blau); border-radius: 32px; background: var(--weiss); color: var(--blau-tief);
+.chip { min-height: 64px; padding: 0 16px; border: 3px solid var(--blau); border-radius: 32px; background: var(--weiss); color: var(--blau-tief);
   font: 700 18px var(--schrift); cursor: pointer; touch-action: none; }
 .chip.gewaehlt { background: var(--blau); color: var(--weiss); }
-#wahlGelb.gewaehlt { background: var(--gelb); color: var(--blau-tief); }
+.chip.gelb.gewaehlt { background: var(--gelb); color: var(--blau-tief); }
+#menue { width: min(620px, calc(100vw - 32px)); max-height: calc(100dvh - 32px); overflow: auto; }
+@media (min-width: 1000px) { #menue { left: calc(24px + var(--rand-l)); transform: translateY(-50%); } }
+#menue h2 { margin: 0; color: var(--blau); font-size: 28px; }
+#menue.umkleide .nurStart, #menue:not(.umkleide) .nurUmkleide { display: none; }
+#editor { display: grid; gap: 8px; text-align: left; }
+#editor .zeile { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; }
+#editor .zeile > span { flex: 0 0 92px; font-size: 18px; opacity: .7; }
+#dialog[data-art="kunde"] { border-top-color: var(--blau); }
+#dAntworten .knopf { width: 100%; }
+.balken { position: relative; height: 48px; border-radius: 24px; background: #e6ebf0; overflow: hidden; border: 3px solid var(--blau); }
+.ziel { position: absolute; top: 0; bottom: 0; background: #7bd389; }
+.laser { position: absolute; top: 0; bottom: 0; width: 6px; margin-left: -3px; background: var(--rot); box-shadow: 0 0 12px var(--rot); }
+.laser.treffer { background: var(--gruen); box-shadow: 0 0 12px var(--gruen); }
+.stapel { display: grid; gap: 6px; justify-items: center; }
+.kiste { min-height: 64px; border: 3px solid #8a6a3c; border-radius: 10px; background: #d9b47a; color: #3b2a20; font: 700 18px var(--schrift);
+  cursor: pointer; touch-action: none; }
+.kiste.gewaehlt { outline: 4px solid var(--blau); outline-offset: 2px; }
+.kiste:disabled { cursor: default; }
+.regalhinweis { font-size: 18px; opacity: .7; text-align: center; }
 #aktionText { position: fixed; right: calc(28px + var(--rand-r)); bottom: calc(138px + var(--rand-u)); width: 96px; padding: 4px 0;
   border-radius: 14px; background: rgba(255, 255, 255, .92); color: var(--blau-tief); text-align: center; pointer-events: none; }
 #blase { position: fixed; left: 0; top: 0; max-width: 280px; padding: 8px 14px; border-radius: 18px; background: var(--weiss);
@@ -111,14 +129,12 @@ body.dialog #aktion, body.dialog #aktionText, body.dialog #joyzone { display: no
 <div id="toast" hidden></div>
 <div id="hoch"><span>Tipp: iPad quer halten für mehr Überblick</span></div>
 <section id="menue" class="tafel">
-  <h1>EKIA<small>Kaiserslautern</small></h1>
-  <p>Deine Schicht beginnt. Hilf bei 🔴 Notfällen, 🟡 Kolleg:innen und 🟢 Aufgaben!</p>
-  <div class="wahl">
-    <button id="wahlGelb" class="chip" type="button">👕 Gelb · Verkauf</button>
-    <button id="wahlBlau" class="chip" type="button">👕 Blau · Lager & Restaurant</button>
-  </div>
+  <h1 class="nurStart">EKIA<small>Kaiserslautern</small></h1>
+  <h2 class="nurUmkleide">👕 Umkleide</h2>
+  <p class="nurStart">Wähle Abteilung und Aussehen. Hilf bei 🔴 Notfällen, 🟡 Kolleg:innen, 🟢 Aufgaben und ❓ Kundenfragen!</p>
+  <div id="editor"></div>
   <button id="startKnopf" class="knopf" type="button" disabled>Halle wird aufgebaut …</button>
-  <p class="klein">Links ziehen: laufen · rechts: helfen, umziehen, winken<br>Tastatur: WASD/Pfeile, Leertaste oder U, P</p>
+  <p class="klein nurStart">Links ziehen: laufen · rechts: helfen, umziehen, winken<br>Tastatur: WASD/Pfeile, Leertaste oder U, P</p>
 </section>
 <section id="pause" class="tafel" hidden>
   <h1>Pause</h1>

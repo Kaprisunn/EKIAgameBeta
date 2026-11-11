@@ -17,31 +17,28 @@ Halle 64 × 44, weite SB-Halle und Kassen, Click & Collect mit offenem Lagertor,
 Erklärung und Denk-Tipp. Gelb/Blau-Shirt im Startmenü und an Spinden (EG und OG) mit Farb-Wirbel. Kolleg:innen nach
 Kleiderordnung (Restaurant mit Schürze). HUD mit Punkten, Haus-Funk für Notfälle. Fortschritt gespeichert, im Pausenmenü zurücksetzbar.
 
-### M5 – Parkplatz & Glasschiebetür ⬜
-(8.1, 5)
+### M5 – Rollen, Streifen-Shirts, Warnweste & Minispiele ✅
+(9.1–9.3) Charakter-Editor im Startmenü und an den Spinden (Abteilung, Figur, Hautton, Alter mit weißem Bart), Streifen-Shirts,
+Warnweste vor der Logistik, Minispiele Timing (Teppich scannen) und Sortieren (Regal-Sicherheit), Kund:innen mit ❓ folgen kurz
+und stellen Fragen je Abteilung. Nebenfiguren mit weniger Dreiecken.
+
+### M6 – Parkplatz, Glasschiebetür & Wagen-Rallye ⬜
+(8.1, 9.3 Nr. 4, 5)
 - Dritte Ebene: Asphalt, Parkbuchten, blaue Fassade „EKIA KAISERSLAUTERN“, Pfälzerwald-Hügel, Berberitzen-Hecken, Wagenboxen.
 - Breite Glasschiebetür am Ausgang (öffnet animiert, 500 ms Sperre), Überblendung wie beim Aufzug.
-- Wagen-Kette: herrenlose Einkaufswagen einsammeln (hängen sich als Kette an), in der Box abgeben. Mission „Wagen rollen weg“ zieht hierher.
-- ⚠️ Kofferraum-Tetris → Auswahl-Tafel „Was passt wie ins Auto?“ statt echtem Puzzle.
+- Wagen-Rallye: 5 herumstehende Einkaufswagen in 30 Sekunden durch Berührung einsammeln (Countdown im HUD), dann in die Box.
+- Mission „Wagen rollen weg“ zieht auf den Parkplatz. ⚠️ Kofferraum-Tetris → Auswahl-Tafel statt Puzzle.
 **Spielbar:** draußen Wagen sammeln und helfen.
 
-### M6 – Multi-Blaster ⬜
+### M7 – Multi-Blaster ⬜
 (5, 8.1)
-- 🔶 Start an einer Station am Wagen-Häuschen. Wellen grummeliger Kund:innen (rot, Grummel-Wolke), Barcode-Ring (schnell) und
-  Köttbullar-Snack (Fläche), Treffer → glücklich mit Herzchen und blauer Tasche, Punkte.
-- ⚠️ Höchstens 20 Kund:innen, einfache Figuren, Partikel-Pool für Herzchen.
-**Spielbar:** Action-Runde auf dem Parkplatz.
+- 🔶 Start an einer Station am Wagen-Häuschen. Wellen grummeliger Kund:innen, Barcode-Ring und Köttbullar-Snack,
+  Treffer → glücklich mit Herzchen und Tasche, Punkte. ⚠️ Höchstens 20 Kund:innen, Partikel-Pool für Herzchen.
 
-### M7 – Charakter-Auswahl & Figur 2.0 ⬜
-(8.5, 7.2, STIL.md)
-- 12 Profile im Startmenü und am Spind: Herkunft × Geschlecht × Alter (60+ mit weißem Haar, Männer mit weißem Vollbart).
-- Figur aufwerten: Ohren, Augenbrauen, Hals, Schuhe schwarz mit roter Sohle, Shirt-Streifen, Cargohose für Logistik.
-**Spielbar:** eigene Figur wählen.
-
-### M8 – Mehr Lernfälle & Schicht ⬜
+### M8 – Mehr Lernfälle, Schicht & Feinschliff ⬜
 (6.2, 6.3, 8.3)
-- Weitere grüne, gelbe und rote Fälle (Fundgrube, Kasse, englischsprachige Kund:innen), Schichtbericht mit Sternen und Lerntipp.
-- Hochformat-Layout, Leistungstest auf dem iPad, Texte mit dem Team abgleichen.
+- Weitere Fälle als Minispiele (Fundgrube-Reparatur, Restaurant-Takt), Schichtbericht mit Sternen und Lerntipp.
+- Figur-Feinschliff (Ohren, Augenbrauen, Schuhe mit roter Sohle, Cargohose), Hochformat-Layout, Leistungstest auf dem iPad.
 
 ## Später (zurückgestellt)
-Zwei Währungen, Pausenraum-Upgrades, Timing- und Spur-Minispiele.
+Zwei Währungen, Pausenraum-Upgrades.
