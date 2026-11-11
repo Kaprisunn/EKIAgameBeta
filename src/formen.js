@@ -75,14 +75,16 @@ export function baueNetz(liste, { umriss = false, dicke = 0.03, schatten = true,
 }
 
 // Viele gleiche Requisiten als InstancedMesh: ein Draw Call für alle. stellen: [x, z, drehungY, skal]
-export function baueViele(liste, stellen, { schatten = true, y = 0, farbVar = 0 } = {}) {
+// farben: je Instanz eine eigene Farbe (wirkt auf weiße Teile voll, auf dunkle kaum), farbVar: zufällige Helligkeit
+export function baueViele(liste, stellen, { schatten = true, y = 0, farbVar = 0, farben = null } = {}) {
   const geo = verschmelzen(liste.map(([mach, farbe, pos, rot, skal]) => teil(mach(), farbe, pos, rot, skal)));
   const netz = new THREE.InstancedMesh(geo, material('bunt'), stellen.length);
   const o = new THREE.Object3D(), c = new THREE.Color();
   stellen.forEach(([x, z, dreh = 0, s = 1], i) => {
     o.position.set(x, y, z); o.rotation.set(0, dreh, 0); o.scale.setScalar(s); o.updateMatrix();
     netz.setMatrixAt(i, o.matrix);
-    if (farbVar) netz.setColorAt(i, c.setScalar(1 - Math.random() * farbVar));
+    if (farben) netz.setColorAt(i, c.set(farben[i % farben.length]));
+    else if (farbVar) netz.setColorAt(i, c.setScalar(1 - Math.random() * farbVar));
   });
   netz.castShadow = schatten;
   netz.receiveShadow = true;

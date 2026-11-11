@@ -29,6 +29,12 @@ export const LEUTE = {
     ],
     laeufer: [],
   },
+  pp: {
+    kunden: 6,
+    wege: [[-20, -15], [0, -15], [20, -15], [28, -15], [-22, 1.2], [0, 1.2], [20, 1.2], [-10, 17], [8, 17.5], [20, 16.5], [6, -18.5], [-4, -18.5]],
+    kollegen: [[-17, -14.6, 0, 'steht', 'logistik']],
+    laeufer: [],
+  },
 };
 
 // Kurze Sprechblasen (höchstens 12 Wörter), Pfälzer Humor freundlich

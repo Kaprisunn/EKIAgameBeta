@@ -38,6 +38,8 @@ export const ton = {
   wechsel() { [660, 880, 1175].forEach((f, i) => piep(f, 0.12, { typ: 'triangle', laut: 0.12, start: i * 0.06 })); },
   richtig() { piep(784, 0.14, { laut: 0.16 }); piep(1046, 0.25, { laut: 0.16, start: 0.12 }); },
   falsch() { piep(330, 0.25, { typ: 'triangle', laut: 0.14, ende: 260 }); },
+  tuer() { piep(240, 0.35, { laut: 0.07, ende: 520 }); },
+  sammeln() { piep(880, 0.08, { typ: 'square', laut: 0.06 }); piep(1320, 0.12, { typ: 'square', laut: 0.06, start: 0.07 }); },
   ding() { piep(1046, 0.6, { laut: 0.16 }); piep(784, 0.9, { laut: 0.14, start: 0.18 }); },
   winken() { piep(520, 0.12, { typ: 'triangle', ende: 700 }); piep(700, 0.16, { typ: 'triangle', ende: 900, start: 0.13 }); },
   schritt() {

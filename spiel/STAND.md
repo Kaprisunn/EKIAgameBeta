@@ -1,28 +1,28 @@
 # Stand: EKIA Kaiserslautern
 
 **Spiel-Link:** https://claude.ai/artifact/RHUECknAuqPv52VwFmCeHA
-**Letzter Meilenstein:** M5 Rollen, Streifen-Shirts, Warnweste & Minispiele (fertig) · **Nächster:** M6 Parkplatz & Wagen-Rallye
+**Letzter Meilenstein:** M6 Parkplatz, Glasschiebetür & Wagen-Rallye (fertig) · **Nächster:** M7 Multi-Blaster (PLAN.md)
 
 ## Was funktioniert
-- Startmenü = Charakter-Editor: Abteilung (Verkauf, Logistik, Restaurant, ComIn, P&C), Frau/Mann, Hautton, jung/60+ (weißes Haar,
-  Männer mit Vollbart). Figur bleibt rechts neben dem Menü sichtbar. Dieselbe Auswahl an den Spinden („Umkleide“, EG und OG).
-- Streifen-Shirts: Verkauf gelb/dunkelgelb, alle anderen blau/dunkelblau; Restaurant mit Schürze. Profil gespeichert.
-- Warnweste: Ohne Weste stoppt die Schranke zur Logistik, Tafel mit [Weste anlegen]; mit Weste offen (getestet).
-- 11 Missionen (Ampel Rot/Gelb/Grün). Minispiele: Timing „Teppich unterm Wagen“ (Ausgang EG), Sortieren „Regal-Sicherheit“ (Logistik).
-  Die übrigen als Auswahl A/B/C. Kleiderordnung geprüft, Rot gilt immer. Leertaste/U steuert auch die Minispiele.
-- Kund:innen mit ❓ (bis zu 2 je Etage) folgen kurz; „Helfen“ stellt eine Frage passend zur eigenen Abteilung (10 Fragen).
-- Kolleg:innen: Verkauf gelb gestreift, Logistik blau mit Weste, Restaurant mit Schürze, ComIn (meist lange Haare), P&C im Büro.
-- Zwei Etagen mit Treppe, Aufzug, Möbeln, Click & Collect, NPCs, Sprechblasen, HUD und Haus-Funk wie zuvor.
-- Leistung im Test: 59–82 Draw Calls, ca. 67.000–84.000 Dreiecke (Budget 150 / 100.000).
+- Drei Ebenen: Erdgeschoss, Obergeschoss (Treppe, Aufzug) und Parkplatz (Glasschiebetür am Ausgang EG ↔ Tür in der Fassade).
+  Nur die aktive Ebene wird gezeichnet; nach jedem Wechsel 0,9 s Sperre gegen Flackern.
+- Parkplatz: Fassade „EKIA KAISERSLAUTERN“, Gehweg, Parklinien, 20 bunte Autos, Hecken, Wagenboxen, Laternen, Spielplatz,
+  6 Kund:innen (auch mit ❓), ein Logistik-Kollege an der Wagenbox.
+- Wagen-Rallye: am Wagenhäuschen (🛒) starten, 5 Wagen in 30 s einsammeln (Kette folgt), Anzeige im blauen Funk-Streifen,
+  30 Punkte + 1 je Restsekunde. Bei Zeitablauf kein Verlust, neuer Versuch möglich.
+- 12 Missionen (Ampel). Neu draußen: 🔴 „Wagen rollen weg“, 🟢 „Kofferraum-Tetris“ (Sortieren, jedes Shirt).
+- Charakter-Editor (Abteilung inkl. ComIn, P&C; Frau/Mann, Hautton, Alter mit Bart), Streifen-Shirts, Warnweste vor der Logistik,
+  Minispiele (Timing, Sortieren), Kundenfragen je Abteilung, NPCs, HUD, Haus-Funk wie zuvor.
+- Leistung im Test: EG 66 Draw Calls / ca. 68.000 Dreiecke (Budget 150 / 100.000).
+- Getestet: Tür in beide Richtungen, Rallye bis zum Sieg, Kofferraum-Mission startet.
 
 ## Technik-Notizen
-- Profil → Figur: steckbriefAus() in spieler.js. Editor: editor.js. Minispiele: minispiele.js (auswahl, timing, sortieren, weste).
-- Missionen in lerninhalte.js (typ: auswahl | timing | sortieren), Kundenfragen in kundenhilfe.js, Logik in kundenfragen.js.
-- Nebenfiguren mit weniger Unterteilung (figuren.js: fein = 0,6). window.__test: etage, profil, weste, mission, fragende, pos.
+- Ebenen in karte.js (eg, og, pp); Außen-Ebene: aussen: true (Asphalt, Fassade statt Wänden), linien, tueren.
+- Möbel draußen: moebel-aussen.js (Autos mit Farbe je Instanz über `farben`). Rallye: rallye.js.
+- window.__test: etage(id, x, z), profil, weste, mission(id), rallye(), fragende(), pos().
 
 ## Was fehlt
-- Parkplatz mit Glasschiebetür und Wagen-Rallye (M6), Multi-Blaster (M7), weitere Lernfälle und Schichtbericht (M8).
-- Leistung auf dem echten iPad ungeprüft; die Dreiecke liegen je nach Blickwinkel nahe am Budget.
+- Multi-Blaster (M7), mehr Lernfälle, Schichtbericht und Figur-Feinschliff (M8). Leistung auf dem iPad ungeprüft.
 
 ## Bekannte Fehler
-- Kund:innen hängen manchmal kurz an Möbeln. Hängende Schilder verdecken die Figur kurz beim Darunterlaufen.
+- Kund:innen hängen manchmal kurz an Möbeln oder Autos. Hängende Schilder verdecken die Figur kurz beim Darunterlaufen.
