@@ -1,33 +1,28 @@
 # Stand: EKIA Kaiserslautern
 
 **Spiel-Link:** https://claude.ai/artifact/RHUECknAuqPv52VwFmCeHA
-**Letzter Meilenstein:** M3 Mehr Leben im Haus (fertig) · **Nächster:** M4 Haupt- und Nebenmissionen (PLAN.md)
+**Letzter Meilenstein:** M4 Ampel-Missionen & Kleiderordnung (fertig) · **Nächster:** M5 Parkplatz & Glasschiebetür
 
 ## Was funktioniert
-- Menü → Spiel → Pause (Knopf oben rechts, P/Esc, Tab-Wechsel pausiert). Etagen-Anzeige oben links.
-- Halle 64 × 44, zwei Etagen; Treppe (hineinlaufen) und Aufzug (Knopf ⬆️/⬇️) wechseln mit Überblendung.
-- EG: Markthalle (Regale, Wühltische, Lampentisch, Bilderwand, Körbe, Teppiche, Pflanzenregal), SB-Halle mit
-  8 breiten Gängen und Abholbereich, 5 Kassen mit Absperrungen, 3 SB-Kassen, Hotdog-Bereich, Fundgrube, Säulen,
-  Einkaufswagen. Logistik hinter Zaun und Schranke (öffnet nur für Rolle Logistik). Click & Collect:
-  Theke vor dem offenen Lagertor, ein Logistiker trägt Kartons vom Lager zur Theke.
-- OG: Wohnzimmer, Schlafzimmer, Küche, Kinderzimmer, Restaurant (9 Tischgruppen), Umkleide (Spinde, Spiegel,
-  Kabine, Knopf „Umziehen“ zeigt Hinweis), Großraumbüro mit 5 Schreibtisch-Inseln.
-- NPCs: 9 Kund:innen im EG, 8 im OG (bunt, verschiedene Hauttöne, teils mit Tüte); 8 Kolleg:innen je Etage
-  (stehen, sitzen am Schreibtisch, Kasse, Theke). Sprechblasen in der Nähe, Winken wird meist erwidert.
-- Rolle Verkauf/Logistik per Testknopf im Pausenmenü (gespeichert).
-- Leistung im Test: Eingang EG 61 Draw Calls / ca. 72.000 Dreiecke; OG 46 / 54.000 (Budget 150 / 100.000).
+- Menü mit Shirt-Wahl (Gelb · Verkauf / Blau · Lager & Restaurant) → Spiel → Pause (Missionen zurücksetzen mit zwei Tippern).
+- Zwei Etagen (64 × 44) mit Treppe, Aufzug, vielen Möbeln, Click & Collect, NPCs mit Sprechblasen und Winken.
+- 10 Missionen mit schwebenden Symbolen (über Wände sichtbar): 🔴 Pfütze (Hauptgang EG), Karton (Gang 3), Wagen (Ausgang);
+  🟡 schwerer Karton (Logistik), Kassen-Stau (Büro OG), Transport (Kundenservice); 🟢 Preisschild (Showroom OG),
+  Mehrpaket (Kasse), Paletten (Logistik), Frische (Restaurant OG). Knopf zeigt ❗/🤝/✅ in der Nähe.
+- Kleiderordnung geprüft (Rot gilt immer). Spinde: EG bei der SB-Halle (18.7, -12.5), OG in der Umkleide. Farb-Wirbel beim Umziehen.
+- Punkte: Rot 30, Gelb 20, Grün 10, nach falscher Antwort die Hälfte. Fortschritt und Shirt gespeichert.
+- HUD oben links, Haus-Funk oben (rot) bei offenen Notfällen. Logistik-Schranke öffnet mit blauem Shirt.
+- Kolleg:innen tragen Gelb (Verkauf), Blau (Logistik, Restaurant mit Schürze) oder gemischt (Büro).
+- Leistung im Test: 50–53 Draw Calls, ca. 55.000–68.000 Dreiecke (Budget 150 / 100.000).
+- Getestet: Rot öffnet mit blauem Shirt, Verkaufsaufgabe mit Blau wird abgelehnt, Spind wechselt, Punkte zählen.
 
 ## Technik-Notizen
-- Grundriss: src/karte.js. Leute: src/leute.js (Wegpunkte, Kolleg:innen, Sprüche). Möbeltypen: moebel.js,
-  moebel-og.js, moebel-deko.js. NPC-Logik: npc.js (nur aktive Etage, keine echten Schatten, Schattenflecken).
-- Nebenfiguren nutzen baueFigur mit `einfach: true` (Augen im Kopf, 6 Draw Calls pro Figur).
-- Schilder-Atlas jetzt 2048 × 1024. window.__test.etage(id, x, z) versetzt die Figur.
-- Dreiecke werden knapp: neue große Deko sparsam, NPC-Anzahl je Etage nicht über ca. 18.
+- Missionen nur in src/lerninhalte.js ändern (Texte, Orte, Antworten). Logik: missionen.js; Personen dazu baut npc.js.
+- Spieler-Figur steckt in einer festen Hülle (spieler.js); setzeShirt baut die Figur neu.
+- window.__test: etage(id, x, z), shirt('gelb'|'blau'), mission(id).
 
 ## Was fehlt
-- Missionen und Kundenfragen (M4), Schicht (M5), Figur 2.0 und Editor (M6, M7).
-- Leistung auf dem echten iPad ungeprüft.
+- Parkplatz, Blaster, Charakter-Profile, weitere Lernfälle (PLAN.md M5–M8). Leistung auf dem iPad ungeprüft.
 
 ## Bekannte Fehler
-- Kund:innen können kurz an Möbeln hängen, bevor sie ein neues Ziel wählen. Hängende Schilder verdecken die
-  Figur kurz, wenn man darunter durchläuft.
+- Kund:innen hängen manchmal kurz an Möbeln. Hängende Schilder verdecken die Figur kurz beim Darunterlaufen.

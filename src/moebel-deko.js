@@ -76,6 +76,12 @@ function torOffen() {
 }
 
 export const MOEBEL_DEKO = {
+  // Schnellwechsel-Spinde zum Umziehen (Gelb ⇄ Blau)
+  spindklein: {
+    teile: [0, 1, 2].flatMap((i) => [[Q(0.58, 2, 0.5), F.grau, [-0.6 + i * 0.6, 1, 0]], [Q(0.5, 1.85, 0.03), i === 1 ? F.blau : F.metall, [-0.6 + i * 0.6, 1, 0.26]],
+      [Q(0.04, 0.15, 0.03), F.gelb, [-0.42 + i * 0.6, 1, 0.285]]]),
+    fuss: [[1.9, 0.6]],
+  },
   saeule: { teile: [[Q(0.8, 4.5, 0.8), F.wand, [0, 2.25, 0]], [Q(0.86, 0.6, 0.86), F.blau, [0, 4.2, 0]], [Q(0.9, 0.25, 0.9), F.birke, [0, 0.12, 0]]], fuss: [[0.9, 0.9]], viele: true },
   lampen: { teile: lampen(), fuss: [[3, 1.4]] },
   bilderwand: { teile: bilderwand(), fuss: [[3.4, 0.5]] },

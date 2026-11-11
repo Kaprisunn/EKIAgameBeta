@@ -1,4 +1,5 @@
-// Einstieg: Renderer, Szene, Spielschleife mit Zuständen, Etagenwechsel, Leistungsanpassung, Fehleranzeige.
+// Einstieg: Renderer, Szene, Spielschleife mit Zuständen, Etagenwechsel, Kleiderordnung, Missionen,
+// Leistungsanpassung und Fehleranzeige.
 import * as THREE from 'three';
 import { erstelleWelt } from './welt.js';
 import { erstelleSpieler } from './spieler.js';
@@ -7,10 +8,12 @@ import { erstelleEingabe } from './eingabe.js';
 import { erstelleUI } from './ui.js';
 import { erstelleInteraktion } from './interaktion.js';
 import { erstelleLeute } from './npc.js';
+import { erstelleMissionen } from './missionen.js';
 import { erstelleZustand, Z, speicher } from './zustand.js';
 import { ton } from './audio.js';
 
 const zeigeFehler = window.__zeigeFehler || ((e) => console.error(e));
+const SHIRT_TEXT = { gelb: 'Gelb: Verkauf, Kasse, Service und Fundgrube', blau: 'Blau: Logistik und Restaurant' };
 
 function starte() {
   const renderer = new THREE.WebGLRenderer({ antialias: true, powerPreference: 'high-performance' });
@@ -26,14 +29,22 @@ function starte() {
 
   const szene = new THREE.Scene();
   const welt = erstelleWelt(szene);
-  const spieler = erstelleSpieler(szene, welt);
+  // Kleiderordnung: gelbes oder blaues Shirt (gespeichert). Blau öffnet auch die Logistik-Schranke.
+  let shirt = speicher.laden('shirt', 'gelb');
+  const spieler = erstelleSpieler(szene, welt, shirt);
   const leute = erstelleLeute(welt);
   const kam = erstelleKamera();
   const zustand = erstelleZustand();
-  let neuZeichnen = true;
-  // Rolle bis zum Charakter-Editor (M5) per Testknopf im Pausenmenü umschaltbar
-  let rolle = speicher.laden('rolle', 'verkauf');
+  let neuZeichnen = true, tafelOffen = false;
 
+  const hud = () => ui.hud({ def: welt.etage.def, shirt, punkte: missionen.punkte, erledigt: missionen.erledigt, gesamt: missionen.gesamt });
+  function setzeShirt(farbe) {
+    shirt = farbe;
+    speicher.speichern('shirt', shirt);
+    spieler.setzeShirt(shirt);
+    ui.wahl(shirt);
+    hud();
+  }
   // Etagenwechsel mit kurzer Überblendung; die Figur landet am Ankunftspunkt der Ziel-Etage
   function wechsleEtage(p) {
     ui.blende(() => {
@@ -42,18 +53,24 @@ function starte() {
       spieler.teleport(x, z, dreh);
       kam.folge(spieler.pos, spieler.tempo, 0, true);
       welt.folgeSonne(spieler.pos);
-      ui.etage(welt.etage.def, rolle);
+      hud();
     });
+  }
+  function missionFertig() {
+    tafelOffen = false;
+    hud();
+    if (missionen.erledigt === missionen.gesamt) ui.toast('Alle Missionen geschafft! Starke Schicht! 🎉', 5000);
   }
   const interaktion = erstelleInteraktion({
     treppe: wechsleEtage,
     aufzug: (p) => { ton.ding(); wechsleEtage(p); },
-    schranke: () => { if (rolle !== 'logistik') ui.toast('Nur für Logistik. Als Verkäufer:in hast du hier keinen Zutritt.'); },
-    umkleide: () => ui.toast('Hier ziehst du dich bald um: Der Charakter-Editor folgt.'),
+    schranke: () => { if (shirt !== 'blau') ui.toast('Nur für Logistik: Mit gelbem Shirt kein Zutritt. Am Spind kannst du dich umziehen.'); },
+    spind: () => { setzeShirt(shirt === 'gelb' ? 'blau' : 'gelb'); ton.wechsel(); ui.toast(`Umgezogen! ${SHIRT_TEXT[shirt]}.`); },
+    mission: (p) => { if (missionen.starte(p.mission, shirt, missionFertig)) tafelOffen = true; },
   });
 
   const aktion = () => {
-    if (zustand.get() !== Z.SPIEL) return;
+    if (zustand.get() !== Z.SPIEL || tafelOffen) return;
     if (interaktion.nah) interaktion.ausloesen();
     else { spieler.winken(); leute.winken(spieler.pos); }
   };
@@ -66,20 +83,19 @@ function starte() {
     weiter: () => zustand.setze(Z.SPIEL),
     pause: umschaltenPause,
     aktion,
-    rolle: () => {
-      rolle = rolle === 'logistik' ? 'verkauf' : 'logistik';
-      speicher.speichern('rolle', rolle);
-      ui.etage(welt.etage.def, rolle);
-    },
+    shirt: setzeShirt,
+    zuruecksetzen: () => { missionen.zuruecksetzen(); hud(); ui.toast('Alle Missionen sind wieder offen.'); },
   });
+  const missionen = erstelleMissionen({ welt, leute, ui });
   const eingabe = erstelleEingabe({
     aktion,
     pause: umschaltenPause,
-    start: () => { if (zustand.get() !== Z.SPIEL) zustand.setze(Z.SPIEL); },
+    start: () => { if (zustand.get() === Z.MENUE) zustand.setze(Z.SPIEL); },
   });
   zustand.beiWechsel((neu) => { ui.zeige(neu); eingabe.zuruecksetzen(); neuZeichnen = true; });
   ui.zeige(Z.MENUE);
-  ui.etage(welt.etage.def, rolle);
+  ui.wahl(shirt);
+  hud();
   document.addEventListener('visibilitychange', () => { if (document.hidden && zustand.get() === Z.SPIEL) zustand.setze(Z.PAUSE); });
 
   function groesse() {
@@ -94,8 +110,12 @@ function starte() {
   kam.folge(spieler.pos, spieler.tempo, 0, true);
 
   const info = (window.__info = { drawCalls: 0, dreiecke: 0, pixelRatio: stufen[0], zustand: Z.MENUE, etage: welt.etage.id });
-  // Testhilfe für tools/check.mjs und Fehlersuche: Etage wechseln, Figur versetzen
-  window.__test = { etage: (id, x = -14, z = 14.5) => { welt.zeige(id); spieler.teleport(x, z); ui.etage(welt.etage.def, rolle); } };
+  // Testhilfe für tools/check.mjs und Fehlersuche
+  window.__test = {
+    etage: (id, x = -20, z = 18.5) => { welt.zeige(id); spieler.teleport(x, z); kam.folge(spieler.pos, spieler.tempo, 0, true); hud(); },
+    shirt: setzeShirt,
+    mission: (id) => missionen.starte(id, shirt, missionFertig) && (tafelOffen = true),
+  };
   let letzte = performance.now(), messZeit = 0, messBilder = 0;
 
   // Sprechblase über dem Kopf: 3D-Punkt in Bildschirmkoordinaten umrechnen
@@ -118,14 +138,18 @@ function starte() {
       neuZeichnen = false;
 
       if (z !== Z.PAUSE) {
-        spieler.update(dt, eingabe.richtung(), z === Z.SPIEL);
+        spieler.update(dt, eingabe.richtung(), z === Z.SPIEL && !tafelOffen);
         leute.update(dt, welt.etage.id, spieler.pos);
         leute.schiebeSpieler(spieler.pos);
-        welt.update(dt, spieler.pos, rolle);
-        if (z === Z.SPIEL) ui.aktion(interaktion.update(welt.etage.punkte, spieler.pos));
+        welt.update(dt, spieler.pos, shirt === 'blau' ? 'logistik' : 'verkauf');
+        const funk = missionen.update(dt, welt.etage.id);
+        if (z === Z.SPIEL) {
+          ui.aktion(tafelOffen ? null : interaktion.update(welt.etage.punkte, spieler.pos));
+          ui.funk(funk);
+        }
         kam.folge(spieler.pos, spieler.tempo, dt);
         welt.folgeSonne(spieler.pos);
-        zeigeBlase(z === Z.SPIEL ? leute.blase : null);
+        zeigeBlase(z === Z.SPIEL && !tafelOffen ? leute.blase : null);
       }
       renderer.render(szene, kam.kamera);
       info.drawCalls = renderer.info.render.calls;

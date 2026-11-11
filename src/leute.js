@@ -1,6 +1,7 @@
 // Wer im Haus unterwegs ist (reine Daten), je Etage:
 // kunden:   Anzahl Kund:innen, die zwischen den Wegpunkten `wege` bummeln
-// kollegen: [x, z, blickrichtung, haltung ('steht' | 'sitzt'), rolle ('verkauf' | 'logistik')]
+// kollegen: [x, z, blickrichtung, haltung ('steht' | 'sitzt'), rolle]
+//           rolle: verkauf = gelbes Shirt, logistik = blau, gastro = blau mit Schürze, buero = gemischt
 // laeufer:  Kolleg:innen, die einen festen Weg hin und her gehen und auf dem Hinweg Ware tragen
 const R = Math.PI / 2, P = Math.PI;
 
@@ -22,9 +23,9 @@ export const LEUTE = {
     wege: [[-20, -14], [-13.2, -13.6], [-6.2, -13.6], [0.4, -13.6], [-16, -4], [-4, -2], [6, -4], [0, 1], [19.25, -14.75],
       [23.75, -10.25], [19.25, -5.5], [28.8, -12], [23.75, -14.75], [-6, 9], [8, 6], [-20, 4], [14, -1]],
     kollegen: [
-      [-10, -12.5, 0, 'steht', 'verkauf'], [24, -19.9, 0, 'steht', 'verkauf'], [28.8, -4, -R, 'steht', 'verkauf'],
-      [6, 18.25, P, 'sitzt', 'verkauf'], [11, 15.75, 0, 'sitzt', 'verkauf'], [21, 18.25, P, 'sitzt', 'logistik'],
-      [26, 15.75, 0, 'sitzt', 'verkauf'], [-12.8, 15.6, P, 'steht', 'logistik'],
+      [-10, -12.5, 0, 'steht', 'verkauf'], [24, -19.9, 0, 'steht', 'gastro'], [28.8, -4, -R, 'steht', 'gastro'],
+      [6, 18.25, P, 'sitzt', 'buero'], [11, 15.75, 0, 'sitzt', 'buero'], [21, 18.25, P, 'sitzt', 'buero'],
+      [26, 15.75, 0, 'sitzt', 'buero'], [-15.5, 16.8, P, 'steht', 'buero'],
     ],
     laeufer: [],
   },

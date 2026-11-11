@@ -47,7 +47,7 @@ export function erstelleEingabe({ aktion, pause, start }) {
   window.addEventListener('keydown', (e) => {
     if (BEWEGUNG[e.code]) { tasten.add(e.code); e.preventDefault(); return; }
     if (e.repeat) return;
-    if (e.code === 'Space' || e.code === 'KeyE') { e.preventDefault(); aktion(); }
+    if (e.code === 'Space' || e.code === 'KeyE' || e.code === 'KeyU') { e.preventDefault(); aktion(); }
     else if (e.code === 'Escape' || e.code === 'KeyP') pause();
     else if (e.code === 'Enter') start();
   });

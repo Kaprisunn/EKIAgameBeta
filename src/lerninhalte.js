@@ -1,0 +1,112 @@
+// Lern-Missionen als reine Daten (Ampel-System aus SPIEL.md 8.3). Beispieltexte: bitte vom Team prüfen lassen.
+// art:   rot = Notfall (gilt für alle Shirts), gelb = Kollegenhilfe, gruen = Aufgabe
+// zone:  verkauf = gelbes Shirt, logistik = blaues Shirt (Lager und Restaurant), buero = beide Farben
+// ort:   [x, z, blickrichtung] der Person bzw. Gefahrenstelle; knopf = anderer Interaktionspunkt
+// person: 'kunde' oder 'kollege' (rolle bestimmt die Kleidung), gefahr: 'pfuetze' oder 'karton'
+const P = Math.PI, R = Math.PI / 2;
+
+export const PUNKTE = { gruen: 10, gelb: 20, rot: 30 };
+export const ART = { rot: { zeichen: '❗', name: 'Notfall' }, gelb: { zeichen: '🤝', name: 'Kollegenhilfe' }, gruen: { zeichen: '✅', name: 'Aufgabe' } };
+
+export const MISSIONEN = [
+  {
+    id: 'preisschild', art: 'gruen', zone: 'verkauf', etage: 'og', person: 'kunde', ort: [-13.2, -14.6, P],
+    titel: 'Preisschild lesen', bereich: 'Showroom',
+    text: 'Ein Kunde zeigt auf das Preisschild am Bett: „Wo find ich des denn zum Mitnehmen?“',
+    frage: 'Was zeigst du ihm?',
+    antworten: ['Ihn zur Kasse schicken, dort wird alles geklärt.', 'Die Maße prüfen und Gang- und Fachnummer für die SB-Halle zeigen.', 'Sagen, dass er im Lager selbst suchen soll.'],
+    richtig: 1,
+    warum: 'Auf dem Preisschild stehen die Maße und der Lagerort in der SB-Halle. So findet der Kunde sein Paket und weiß vorher, ob es passt.',
+    tipp: 'Schau, was alles auf dem Preisschild steht. Welche Angabe führt in die SB-Halle?',
+  },
+  {
+    id: 'mehrpaket', art: 'gruen', zone: 'verkauf', etage: 'eg', person: 'kunde', ort: [4, 9.3, 0],
+    titel: 'Mehrpaket-Kontrolle', bereich: 'Kasse',
+    text: 'Auf dem Band liegt ein Schrankpaket mit dem Aufdruck „Paket 1 von 2“. Das zweite Paket fehlt.',
+    frage: 'Was machst du vor dem Bezahlen?',
+    antworten: ['Einfach kassieren, der Kunde merkt es zu Hause.', 'Paket 1 zurück ins Lager bringen.', 'Den Kunden freundlich auf Paket 2 hinweisen und zeigen, wo es liegt.'],
+    richtig: 2,
+    warum: 'Ohne Paket 2 lässt sich der Schrank nicht aufbauen. Ein Hinweis vor dem Bezahlen spart dem Kunden eine zweite Fahrt.',
+    tipp: 'Was passiert, wenn der Kunde zu Hause merkt, dass ein Teil fehlt?',
+  },
+  {
+    id: 'paletten', art: 'gruen', zone: 'logistik', etage: 'eg', person: 'kollege', rolle: 'logistik', ort: [27.6, -8.25, R],
+    titel: 'Paletten-Sicherheit', bereich: 'Logistik',
+    text: 'Eine Palette wird neu gepackt. Schwere und leichte Kartons stehen durcheinander, einer steht im Fluchtweg.',
+    frage: 'Wie packst du richtig?',
+    antworten: ['Schwere Kartons nach unten, leichte nach oben, Fluchtweg freiräumen.', 'Leichte Kartons unten, schwere oben, damit man sie gut greift.', 'Egal wie, Hauptsache schnell. Den Fluchtweg räumen wir später.'],
+    richtig: 0,
+    warum: 'Schwer unten macht die Palette stabil. Ein freier Fluchtweg kann im Notfall Leben retten.',
+    tipp: 'Denk an einen Turm aus Bauklötzen: Was muss unten liegen, damit er nicht kippt?',
+  },
+  {
+    id: 'frische', art: 'gruen', zone: 'logistik', etage: 'og', person: 'kollege', rolle: 'gastro', ort: [21, -19.9, 0],
+    titel: 'Frische-Taktung', bereich: 'Restaurant',
+    text: 'Es ist 11:15 Uhr. In der Ausgabe liegen noch zwei Bleche Köttbullar, um 12 Uhr kommt der Mittags-Ansturm.',
+    frage: 'Was tust du?',
+    antworten: ['Warten, bis das letzte Blech leer ist.', 'Jetzt Nachschub aus der Küche anfordern.', 'Die Ausgabe schließen, bis die Küche von selbst liefert.'],
+    richtig: 1,
+    warum: 'Die Küche braucht Vorlauf. Wer vor dem Ansturm bestellt, hat frische Ware, wenn viele Gäste kommen.',
+    tipp: 'Wie lange dauert es wohl, bis neue Köttbullar fertig sind?',
+  },
+  {
+    id: 'schwer', art: 'gelb', zone: 'logistik', etage: 'eg', person: 'kollege', rolle: 'logistik', ort: [23, -4, 0],
+    titel: 'Schwerer Karton', bereich: 'Logistik',
+    text: 'Ein Kollege will allein einen Karton mit über 25 kg anheben: „Hilf mir mal kurz!“',
+    frage: 'Wie hebt ihr den Karton?',
+    antworten: ['Mit rundem Rücken schnell hochreißen.', 'Er soll es allein versuchen, du schaust zu.', 'Zu zweit, mit geradem Rücken aus den Beinen heben.'],
+    richtig: 2,
+    warum: 'Schwere Lasten hebt man zu zweit und aus den Beinen. So schont ihr den Rücken und vermeidet Verletzungen.',
+    tipp: 'Welche Muskeln sind stärker: die im Rücken oder die in den Beinen?',
+  },
+  {
+    id: 'stau', art: 'gelb', zone: 'buero', etage: 'og', person: 'kollege', rolle: 'buero', ort: [18.5, 15, 0],
+    titel: 'Kassen-Stau', bereich: 'Großraumbüro',
+    text: 'Der Funk meldet lange Schlangen an den Kassen. In der Markthalle ist gerade wenig los.',
+    frage: 'Wie koordinierst du?',
+    antworten: ['Geschulte Kolleg:innen aus der ruhigen Markthalle an weitere Kassen schicken.', 'Abwarten, die Schlange löst sich von selbst.', 'Alle Kolleg:innen aus der Logistik an die Kasse schicken.'],
+    richtig: 0,
+    warum: 'Wer an der Kasse geschult ist und gerade Zeit hat, hilft sofort, ohne dass anderswo Arbeit liegen bleibt.',
+    tipp: 'Wer kann an der Kasse arbeiten, und wo ist gerade wenig los?',
+  },
+  {
+    id: 'transport', art: 'gelb', zone: 'verkauf', etage: 'eg', person: 'kollege', rolle: 'verkauf', ort: [22.5, 14.6, 0],
+    titel: 'Transportproblem', bereich: 'Kundenservice',
+    text: 'Eine Kollegin ruft dich: Ein Kunde bekommt sein großes Regal nicht ins Auto.',
+    frage: 'Welche Hilfe bietet ihr an?',
+    antworten: ['Das Paket aufreißen und die Teile lose stapeln.', 'Den Umklapp-Trick für die Rücksitze zeigen oder Lieferservice bzw. Miettransporter anbieten.', 'Sagen, dass das nicht unser Problem ist.'],
+    richtig: 1,
+    warum: 'Mit umgeklappten Sitzen passt oft mehr ins Auto. Sonst sorgen Lieferservice oder Transporter dafür, dass der Kauf klappt.',
+    tipp: 'Welche Möglichkeiten bleiben, wenn das Auto zu klein ist?',
+  },
+  {
+    id: 'pfuetze', art: 'rot', etage: 'eg', gefahr: 'pfuetze', ort: [-19, -7.5], hoehe: 1.9,
+    titel: 'Rutschgefahr!', bereich: 'Hauptgang',
+    text: 'Auf dem Hauptgang ist ein Getränk ausgelaufen. Kund:innen laufen direkt darauf zu.',
+    frage: 'Was tust du zuerst?',
+    antworten: ['Schnell Putzzeug holen und die Stelle so lange allein lassen.', 'An der Stelle bleiben, absichern und Kolleg:innen um Reinigungsset und Warnschild bitten.', 'Weitergehen, die Reinigung kommt bestimmt bald.'],
+    richtig: 1,
+    warum: 'Eine unbewachte Pfütze ist eine Sturzgefahr. Wer stehen bleibt und warnt, schützt alle, bis das Warnschild da ist.',
+    tipp: 'Was passiert, wenn niemand bei der Pfütze steht, während du weg bist?',
+  },
+  {
+    id: 'karton', art: 'rot', etage: 'eg', gefahr: 'karton', ort: [-14.2, -14.5], knopf: [-15.25, -11.6], radius: 2.4, hoehe: 4.5,
+    titel: 'Karton droht zu fallen!', bereich: 'SB-Halle, Gang 3',
+    text: 'Im Hochregal in Gang 3 hängt ein schwerer Karton schief über der Kante.',
+    frage: 'Was ist jetzt richtig?',
+    antworten: ['Selbst hochklettern und den Karton zurückschieben.', 'Ein Schild „Vorsicht“ aufhängen und weitergehen.', 'Den Gang sofort für Kund:innen sperren und das Sicherungs-Team rufen.'],
+    richtig: 2,
+    warum: 'Ein fallender Karton kann schwer verletzen. Erst Menschen schützen, dann sichern Fachleute den Karton mit Gerät.',
+    tipp: 'Wer ist in Gefahr, solange der Karton dort hängt?',
+  },
+  {
+    id: 'wagen', art: 'rot', etage: 'eg', ort: [5, 20.2], knopf: [5, 18.6], hoehe: 2.5,
+    titel: 'Wagen rollen weg!', bereich: 'Ausgang',
+    text: 'Eine Reihe Einkaufswagen rollt am Ausgang Richtung Fahrbahn.',
+    frage: 'Was tust du?',
+    antworten: ['Die Reihe sicher am Griff stoppen und in der Wagenbox sichern.', 'Hinterherrufen und hoffen, dass jemand sie aufhält.', 'Ausweichen, das ist Aufgabe der Logistik.'],
+    richtig: 0,
+    warum: 'Rollende Wagen können Autos und Menschen treffen. Stoppen und in der Box sichern verhindert Unfälle.',
+    tipp: 'Wo stehen Einkaufswagen sicher und rollen nicht weg?',
+  },
+];
