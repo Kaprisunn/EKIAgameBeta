@@ -6,6 +6,7 @@ import { erstelleKamera } from './kamera.js';
 import { erstelleEingabe } from './eingabe.js';
 import { erstelleUI } from './ui.js';
 import { erstelleInteraktion } from './interaktion.js';
+import { erstelleLeute } from './npc.js';
 import { erstelleZustand, Z, speicher } from './zustand.js';
 import { ton } from './audio.js';
 
@@ -26,6 +27,7 @@ function starte() {
   const szene = new THREE.Scene();
   const welt = erstelleWelt(szene);
   const spieler = erstelleSpieler(szene, welt);
+  const leute = erstelleLeute(welt);
   const kam = erstelleKamera();
   const zustand = erstelleZustand();
   let neuZeichnen = true;
@@ -47,11 +49,13 @@ function starte() {
     treppe: wechsleEtage,
     aufzug: (p) => { ton.ding(); wechsleEtage(p); },
     schranke: () => { if (rolle !== 'logistik') ui.toast('Nur für Logistik. Als Verkäufer:in hast du hier keinen Zutritt.'); },
+    umkleide: () => ui.toast('Hier ziehst du dich bald um: Der Charakter-Editor folgt.'),
   });
 
   const aktion = () => {
     if (zustand.get() !== Z.SPIEL) return;
-    if (interaktion.nah) interaktion.ausloesen(); else spieler.winken();
+    if (interaktion.nah) interaktion.ausloesen();
+    else { spieler.winken(); leute.winken(spieler.pos); }
   };
   const umschaltenPause = () => {
     if (zustand.get() === Z.SPIEL) zustand.setze(Z.PAUSE);
@@ -94,6 +98,14 @@ function starte() {
   window.__test = { etage: (id, x = -14, z = 14.5) => { welt.zeige(id); spieler.teleport(x, z); ui.etage(welt.etage.def, rolle); } };
   let letzte = performance.now(), messZeit = 0, messBilder = 0;
 
+  // Sprechblase über dem Kopf: 3D-Punkt in Bildschirmkoordinaten umrechnen
+  const kopf = new THREE.Vector3();
+  function zeigeBlase(b) {
+    if (!b) return ui.blase(null);
+    kopf.set(b.x, b.y, b.z).project(kam.kamera);
+    ui.blase(b.text, (kopf.x * 0.5 + 0.5) * window.innerWidth, (-kopf.y * 0.5 + 0.5) * window.innerHeight);
+  }
+
   renderer.setAnimationLoop((jetzt) => {
     try {
       const echt = (jetzt - letzte) / 1000;
@@ -107,10 +119,13 @@ function starte() {
 
       if (z !== Z.PAUSE) {
         spieler.update(dt, eingabe.richtung(), z === Z.SPIEL);
+        leute.update(dt, welt.etage.id, spieler.pos);
+        leute.schiebeSpieler(spieler.pos);
         welt.update(dt, spieler.pos, rolle);
         if (z === Z.SPIEL) ui.aktion(interaktion.update(welt.etage.punkte, spieler.pos));
         kam.folge(spieler.pos, spieler.tempo, dt);
         welt.folgeSonne(spieler.pos);
+        zeigeBlase(z === Z.SPIEL ? leute.blase : null);
       }
       renderer.render(szene, kam.kamera);
       info.drawCalls = renderer.info.render.calls;

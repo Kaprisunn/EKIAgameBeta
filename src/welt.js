@@ -102,6 +102,7 @@ export function erstelleWelt(szene) {
   let aktiv = null;
   const SONNE_VERSATZ = new THREE.Vector3(9, 18, 10), texel = 30 / 1024;
   const welt = {
+    etagen,
     get etage() { return aktiv; },
     // Zeigt nur die gewählte Etage; im OG sinkt die Außenwelt, damit es nach „oben“ aussieht
     zeige(id) {

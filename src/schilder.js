@@ -6,12 +6,13 @@ import { teil, zylinder } from './formen.js';
 import { FARBE } from './daten.js';
 
 const STIL = { blau: ['#0058ab', '#fbd914'], gelb: ['#fbd914', '#0058ab'], weiss: ['#ffffff', '#0058ab'], warn: ['#fbd914', '#1f1f1f'] };
-const GROESSE = 1024, ZEILE = 80;
+const BREITE = 2048, HOEHE = 1024, ZEILE = 80;
 const schrift = (px) => `800 ${px}px ui-rounded, "SF Pro Rounded", "Arial Rounded MT Bold", "Helvetica Neue", Arial, sans-serif`;
 
 export function erstelleSchilder() {
   const leinwand = document.createElement('canvas');
-  leinwand.width = leinwand.height = GROESSE;
+  leinwand.width = BREITE;
+  leinwand.height = HOEHE;
   const ctx = leinwand.getContext('2d');
   const textur = new THREE.CanvasTexture(leinwand);
   textur.colorSpace = THREE.SRGBColorSpace;
@@ -25,10 +26,10 @@ export function erstelleSchilder() {
     const schluessel = stil + '|' + text;
     if (plaetze.has(schluessel)) return plaetze.get(schluessel);
     let px = 50;
-    do { ctx.font = schrift(px); px -= 4; } while (ctx.measureText(text).width + 56 > GROESSE && px > 20);
+    do { ctx.font = schrift(px); px -= 4; } while (ctx.measureText(text).width + 56 > BREITE && px > 20);
     const b = Math.ceil(ctx.measureText(text).width) + 56;
-    if (x + b > GROESSE) { x = 0; y += ZEILE; }
-    if (y + ZEILE > GROESSE) throw new Error('Schilder-Atlas ist voll');
+    if (x + b > BREITE) { x = 0; y += ZEILE; }
+    if (y + ZEILE > HOEHE) throw new Error('Schilder-Atlas ist voll');
     const [grund, farbe] = STIL[stil] ?? STIL.gelb;
     ctx.fillStyle = grund;
     ctx.beginPath();
@@ -38,7 +39,7 @@ export function erstelleSchilder() {
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
     ctx.fillText(text, x + b / 2, y + ZEILE / 2 + 2);
-    const p = { u0: x / GROESSE, u1: (x + b) / GROESSE, v0: 1 - (y + ZEILE) / GROESSE, v1: 1 - y / GROESSE, verh: b / ZEILE };
+    const p = { u0: x / BREITE, u1: (x + b) / BREITE, v0: 1 - (y + ZEILE) / HOEHE, v1: 1 - y / HOEHE, verh: b / ZEILE };
     x += b;
     plaetze.set(schluessel, p);
     return p;

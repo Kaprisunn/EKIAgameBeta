@@ -4,9 +4,10 @@ import * as THREE from 'three';
 import { material, teil, verschmelzen, baueViele, quader, zylinder } from './formen.js';
 import { MOEBEL } from './moebel.js';
 import { MOEBEL_OG } from './moebel-og.js';
+import { MOEBEL_DEKO } from './moebel-deko.js';
 import { FARBE as F, HALLE } from './daten.js';
 
-const ALLE = { ...MOEBEL, ...MOEBEL_OG };
+const ALLE = { ...MOEBEL, ...MOEBEL_OG, ...MOEBEL_DEKO };
 const B = HALLE.breite / 2, T = HALLE.tiefe / 2, m4 = new THREE.Matrix4();
 const Q = (b, h, t) => () => quader(b, h, t);
 
@@ -25,7 +26,7 @@ function kasten(kaesten, x, z, dreh, [b, t, dx = 0, dz = 0]) {
 
 // Facettierter Boden: Fliesen (EG) oder Dielen (OG), leicht gefleckt
 function boden(def) {
-  const geo = new THREE.PlaneGeometry(HALLE.breite, HALLE.tiefe, 26, 18).toNonIndexed();
+  const geo = new THREE.PlaneGeometry(HALLE.breite, HALLE.tiefe, HALLE.breite / 2, HALLE.tiefe / 2).toNonIndexed();
   geo.rotateX(-Math.PI / 2);
   const p = geo.attributes.position, farben = new Float32Array(p.count * 3), c = new THREE.Color();
   for (let i = 0; i < p.count; i += 3) {
@@ -64,18 +65,34 @@ function zaun(statisch, kaesten, [x1, z1, x2, z2]) {
   kaesten.push([Math.min(x1, x2) - 0.15, Math.min(z1, z2) - 0.15, Math.max(x1, x2) + 0.15, Math.max(z1, z2) + 0.15]);
 }
 
+// Niedrige Trennwand aus Birkenholz (Umkleide, Büro) von (x1, z1) nach (x2, z2)
+function trennwand(statisch, kaesten, [x1, z1, x2, z2]) {
+  const l = Math.hypot(x2 - x1, z2 - z1);
+  lege(statisch, [[Q(0.2, 2.4, l), F.birke, [0, 1.2, 0]], [Q(0.24, 0.12, l), F.blau, [0, 2.44, 0]]], (x1 + x2) / 2, (z1 + z2) / 2, Math.atan2(x2 - x1, z2 - z1));
+  kaesten.push([Math.min(x1, x2) - 0.12, Math.min(z1, z2) - 0.12, Math.max(x1, x2) + 0.12, Math.max(z1, z2) + 0.12]);
+}
+
+// Kollisionskasten des geschlossenen Schrankenarms
+function sperrKasten({ x, z, laenge, dreh = 0 }) {
+  const x2 = x + laenge * Math.cos(dreh), z2 = z - laenge * Math.sin(dreh);
+  return [Math.min(x, x2) - 0.25, Math.min(z, z2) - 0.25, Math.max(x, x2) + 0.25, Math.max(z, z2) + 0.25];
+}
+
 // Schranke mit Portal; der Arm ist ein eigenes Mesh, damit er sich heben kann
-function schranke(gruppe, statisch, { x, z, laenge }) {
+function schranke(gruppe, statisch, { x, z, laenge, dreh = 0 }) {
   lege(statisch, [
     [Q(0.3, 1.1, 0.3), F.gelb, [0, 0.55, 0]], [Q(0.25, 3.2, 0.25), F.gelb, [-0.35, 1.6, 0]],
     [Q(0.25, 3.2, 0.25), F.gelb, [laenge + 0.35, 1.6, 0]], [Q(laenge + 1, 0.35, 0.3), F.gelb, [laenge / 2, 3.1, 0]],
-  ], x, z);
+  ], x, z, dreh);
   const arm = [];
   for (let i = 0; i < 4; i++) arm.push(teil(quader(laenge / 4, 0.12, 0.12), i % 2 ? F.schwarz : F.gelb, [(i + 0.5) * laenge / 4, 0, 0]));
   const netz = new THREE.Mesh(verschmelzen(arm), material('bunt'));
   netz.castShadow = true;
-  netz.position.set(x, 1.0, z);
-  gruppe.add(netz);
+  const drehpunkt = new THREE.Group();
+  drehpunkt.position.set(x, 1.0, z);
+  drehpunkt.rotation.y = dreh;
+  drehpunkt.add(netz);
+  gruppe.add(drehpunkt);
   return netz;
 }
 
@@ -104,23 +121,25 @@ export function baueEtage(id, def, schilder) {
     stellen.forEach(([x, z, dreh]) => (m.fuss ?? []).forEach((f) => kasten(kaesten, x, z, dreh, f)));
   }
   (def.zaeune ?? []).forEach((s) => zaun(statisch, kaesten, s));
+  (def.trennwaende ?? []).forEach((w) => trennwand(statisch, kaesten, w));
   const s = def.schranke, arm = s ? schranke(gruppe, statisch, s) : null;
   const schildNetz = schilder.baue(def.schilder, statisch);
 
   const netz = new THREE.Mesh(verschmelzen(statisch), material('bunt'));
   netz.castShadow = netz.receiveShadow = true;
   gruppe.add(netz, pfeile(def.pfeile), schildNetz);
-  const sperre = s && [s.x, s.z - 0.25, s.x + s.laenge, s.z + 0.25];
+  const sperre = s && sperrKasten(s);
 
   return {
     id, def, gruppe, kaesten, punkte: def.punkte ?? [],
     // Kollisionskasten der geschlossenen Schranke (null, wenn offen)
     get sperre() { return arm && arm.rotation.z < 1.0 ? sperre : null; },
-    // Schranke öffnet für Logistik; hinaus kommt man immer
+    // Schranke öffnet für Logistik; hinaus kommt man immer (innen = abgesperrter Bereich)
     update(dt, pos, rolle) {
       if (!arm) return;
-      const nah = Math.hypot(pos.x - (s.x + s.laenge / 2), pos.z - s.z) < 3.5;
-      const auf = nah && (rolle === 'logistik' || pos.z < s.z);
+      const nah = Math.hypot(pos.x - (sperre[0] + sperre[2]) / 2, pos.z - (sperre[1] + sperre[3]) / 2) < 3.5;
+      const [ix1, iz1, ix2, iz2] = s.innen, drinnen = pos.x > ix1 && pos.x < ix2 && pos.z > iz1 && pos.z < iz2;
+      const auf = nah && (rolle === 'logistik' || drinnen);
       arm.rotation.z += ((auf ? 1.35 : 0) - arm.rotation.z) * (1 - Math.exp(-6 * dt));
     },
   };

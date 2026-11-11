@@ -24,7 +24,7 @@ export const FIGUREN = {
   },
 };
 
-export const HALLE = { breite: 52, tiefe: 36, wandHoehe: 4.5, wandDicke: 0.5 };
-export const START = { x: -14, z: 14.5 }; // am Eingang im Erdgeschoss
+export const HALLE = { breite: 64, tiefe: 44, wandHoehe: 4.5, wandDicke: 0.5 };
+export const START = { x: -20, z: 18.5 }; // am Eingang im Erdgeschoss
 export const SPIELER = { tempo: 6.5, radius: 0.55 };
 

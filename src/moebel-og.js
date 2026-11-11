@@ -1,4 +1,4 @@
-// Möbel fürs Obergeschoss (aus Meilenstein 1 übernommen, jetzt relativ zum Ursprung).
+// Möbel fürs Obergeschoss: Showroom-Kojen, Restaurant, Umkleide, Großraumbüro.
 // Wohnkojen: Ursprung = Kojenmitte, Rückwand bei z = -3.75. Format wie in moebel.js.
 import { quader, zylinder, kugel } from './formen.js';
 import { FARBE as F } from './daten.js';
@@ -18,6 +18,28 @@ function theke() {
     const x = -2.4 + i * 1.6;
     t.push([Z(0.3, 0.26, 0.05, 12), F.weiss, [x, 1.1, 0.1]]);
     for (let k = 0; k < 3; k++) t.push([K(0.09, 7, 5), F.wurst, [x - 0.1 + k * 0.1, 1.18, 0.1 + (k % 2) * 0.08]]);
+  }
+  return t;
+}
+
+// Büro-Insel: zwei Arbeitsplätze gegenüber (Stühle bei z = ±1,25), Sichtschutz in der Mitte
+function schreibtische() {
+  const t = [[Q(1.5, 0.06, 1.7), F.weiss, [0, 0.75, 0]], [Q(0.06, 0.72, 1.5), F.dunkelgrau, [-0.7, 0.37, 0]],
+    [Q(0.06, 0.72, 1.5), F.dunkelgrau, [0.7, 0.37, 0]], [Q(1.4, 0.4, 0.04), F.blau, [0, 0.98, 0]]];
+  for (const s of [-1, 1]) {
+    t.push([Q(0.6, 0.38, 0.04), F.schwarz, [0, 1.12, s * 0.28]], [Q(0.06, 0.2, 0.06), F.dunkelgrau, [0, 0.88, s * 0.25]],
+      [Q(0.45, 0.02, 0.15), F.dunkelgrau, [0, 0.79, s * 0.58]], [K(0.05), F.gelb, [0.5, 0.82, s * 0.5]],
+      [Q(0.5, 0.08, 0.5), F.blau, [0, 0.45, s * 1.25]], [Q(0.5, 0.6, 0.07), F.blau, [0, 0.82, s * 1.52]],
+      [Z(0.04, 0.04, 0.4, 6), F.dunkelgrau, [0, 0.22, s * 1.25]], [Z(0.28, 0.28, 0.04, 10), F.dunkelgrau, [0, 0.02, s * 1.25]]);
+  }
+  return t;
+}
+
+function spinde() {
+  const t = [[Q(2.6, 0.08, 0.4), F.birke, [0, 0.45, 1.3]], [Q(0.08, 0.42, 0.36), F.dunkelgrau, [-1.1, 0.21, 1.3]], [Q(0.08, 0.42, 0.36), F.dunkelgrau, [1.1, 0.21, 1.3]]];
+  for (let i = 0; i < 6; i++) {
+    const x = -1.5 + i * 0.6;
+    t.push([Q(0.58, 2, 0.5), F.grau, [x, 1, 0]], [Q(0.5, 1.85, 0.03), i % 2 ? F.blau : F.sofa, [x, 1.0, 0.26]], [Q(0.04, 0.15, 0.03), F.gelb, [x + 0.18, 1.0, 0.285]]);
   }
   return t;
 }
@@ -46,4 +68,32 @@ export const MOEBEL_OG = {
     fuss: [[1.8, 2.3]], viele: true,
   },
   theke: { teile: theke(), fuss: [[7.2, 1.3]] },
+  kueche: {
+    teile: [trennwand(3.3),
+      [Q(4.6, 0.9, 0.65), F.weiss, [-0.6, 0.45, -3.4]], [Q(4.7, 0.06, 0.7), F.birke, [-0.6, 0.93, -3.4]],
+      [Q(0.6, 0.04, 0.4), F.metall, [-1.6, 0.97, -3.4]], [Z(0.03, 0.03, 0.35, 6), F.metall, [-1.6, 1.12, -3.62]],
+      [Q(0.7, 0.03, 0.5), F.schwarz, [0.4, 0.97, -3.4]], [Q(4.6, 0.7, 0.35), F.weiss, [-0.6, 2.0, -3.55]],
+      [Q(0.8, 2.1, 0.7), F.weiss, [2.3, 1.05, -3.35]], [Q(0.05, 0.6, 0.04), F.metall, [1.95, 1.2, -2.98]],
+      [Q(1.4, 0.06, 0.9), F.birke, [0, 0.75, -0.9]], [Z(0.06, 0.06, 0.72, 6), F.weiss, [0, 0.37, -0.9]],
+      ...stuhl(-0.35, 0, 1), ...stuhl(0.35, 0, 1), [Z(0.12, 0.1, 0.18), F.gelb, [0.2, 0.87, -0.9]]],
+    fuss: [[0.3, 5.8, 3.3, -0.9], [4.7, 0.7, -0.6, -3.4], [0.8, 0.7, 2.3, -3.35], [1.5, 1.0, 0, -0.9]],
+  },
+  kinderzimmer: {
+    teile: [trennwand(3.3), [Z(1.5, 1.5, 0.03, 20), F.decke, [0, 0.02, -0.6]],
+      [Q(1.2, 0.4, 2.2), F.blau, [-1.9, 0.2, -2.6]], [Q(1.1, 0.2, 2.0), F.weiss, [-1.9, 0.5, -2.6]],
+      [Q(1.12, 0.1, 1.3), F.gelb, [-1.9, 0.62, -2.2]], [Q(0.7, 0.14, 0.4), F.weiss, [-1.9, 0.66, -3.4]],
+      [K(0.2), 0x9a6b45, [-1.9, 0.86, -3.15]], [K(0.13), 0x9a6b45, [-1.9, 1.12, -3.15]],
+      [Q(1.6, 1.2, 0.35), F.birke, [1.6, 0.6, -3.55]], [K(0.14), F.rot, [1.2, 1.35, -3.5]], [K(0.14), F.blau, [1.6, 1.35, -3.5]], [K(0.14), F.gelb, [2.0, 1.35, -3.5]],
+      [Q(0.5, 0.4, 0.5), F.orange, [1.2, 0.2, -2.6]], [Q(0.5, 0.4, 0.5), F.decke, [1.8, 0.2, -2.6]], [Q(0.5, 0.4, 0.5), F.sofa, [2.4, 0.2, -2.6]],
+      [Z(0.4, 0.4, 0.05, 14), F.weiss, [0.3, 0.5, -0.5]], [Z(0.05, 0.05, 0.48, 6), F.weiss, [0.3, 0.25, -0.5]]],
+    fuss: [[0.3, 5.8, 3.3, -0.9], [1.3, 2.3, -1.9, -2.6], [1.6, 0.4, 1.6, -3.55], [1.8, 0.6, 1.8, -2.6], [0.8, 0.8, 0.3, -0.5]],
+  },
+  spinde: { teile: spinde(), fuss: [[3.6, 0.6], [2.7, 0.5, 0, 1.3]] },
+  spiegel: { teile: [[Q(0.9, 1.9, 0.08), F.birke, [0, 1.05, 0]], [Q(0.75, 1.75, 0.05), F.glas, [0, 1.05, 0.05]], [Q(0.9, 0.06, 0.4), F.birke, [0, 0.03, 0]]], fuss: [[1, 0.45]] },
+  kabine: {
+    teile: [[Q(0.04, 2.1, 1.4), F.weiss, [-0.7, 1.05, 0]], [Q(0.04, 2.1, 1.4), F.weiss, [0.7, 1.05, 0]], [Q(1.4, 2.1, 0.04), F.weiss, [0, 1.05, -0.7]],
+      [Q(1.45, 0.06, 1.45), F.dunkelgrau, [0, 2.12, 0]], [Q(0.9, 1.85, 0.05), F.blau, [-0.25, 1.15, 0.7]], [Z(0.2, 0.2, 0.45, 10), F.birke, [0.3, 0.23, -0.3]]],
+    fuss: [[1.5, 1.5]],
+  },
+  schreibtische: { teile: schreibtische(), fuss: [[1.6, 1.8]], viele: true },
 };

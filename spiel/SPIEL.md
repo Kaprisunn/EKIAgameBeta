@@ -163,3 +163,11 @@ Ein Lern- und Trainingsspiel für Mitarbeiter:innen. Das Haus heißt **EKIA Kais
 - Grundriss als Daten in src/karte.js. Schilder als selbst gezeichneter Text-Atlas (src/schilder.js).
 - 🔶 Herkunft im Editor als 6 Hauttöne + 2 Augenformen, ohne Klischee-Merkmale.
 - 🔶 Rolle ist in der Umkleide jederzeit wechselbar. Parkplatz, Multi-Blaster, Währungen und Pausenraum aus Teil 1 sind zurückgestellt.
+
+### 7.5 Wünsche nach M2 (November 2026)
+- Mehr Möbel und Deko; SB-Halle und Kassenbereich weitläufiger (Halle jetzt 64 × 44).
+- Nach den Kassen rechts ein Kundenservice für Click & Collect mit offenem Tor, durch das die Logistik Ware aus dem Lager herausgibt.
+- NPCs: Kund:innen und Kolleg:innen sowie Haupt- und Nebenmissionen, damit die Welt nicht leer wirkt.
+- 🔶 Reihenfolge: erst Missionen, dann Figur 2.0 und Charakter-Editor.
+- 🔶 Hauptmissionen = Lernmissionen der eigenen Rolle an leuchtenden Zielpunkten (feste Reihenfolge).
+  Nebenmissionen = kurze Aufgaben zwischendurch: Kundenfragen, Kolleg:innen um Hilfe bitten, Fundstücke sammeln.
