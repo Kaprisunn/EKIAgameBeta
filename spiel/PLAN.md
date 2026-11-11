@@ -32,10 +32,16 @@ Sperre gegen Flackern). Wagen-Rallye (rallye.js): 5 Wagen in 30 s einsammeln, si
 (5, 9.4) blaster.js: Station vor der zweiten Wagenbox, 3 Wellen grummeliger Kund:innen (rot, Grummel-Wolke), 📡 Barcode-Ring und
 🧆 Köttbullar-Snack (zweiter Knopf), Herzchen-Partikel, blaue Tasche, Umkehren, Punkte und Bonus. Zähler im blauen Funk-Streifen.
 
-### M8 – Mehr Lernfälle, Schicht & Feinschliff ⬜
-(6.2, 6.3, 8.3)
-- Weitere Fälle als Minispiele (Fundgrube-Reparatur, Restaurant-Takt), Schichtbericht mit Sternen und Lerntipp.
-- Figur-Feinschliff (Ohren, Augenbrauen, Schuhe mit roter Sohle, Cargohose), Hochformat-Layout, Leistungstest auf dem iPad.
+### M8 – Mehr Lernfälle, Schicht & Feinschliff ✅
+(6.2, 6.3, 8.3) Minispiele „Zweite Chance“ (Fundgrube, dreimal festdrehen) und „Restaurant-Takt“ (Tabletts nach Bestellung),
+jetzt 14 Missionen. Schicht von 6 Minuten mit Uhr im HUD, Schichtbericht (Sterne, Werte, Lerntipp; auch über das Pausenmenü).
+Figur: Ohren, Augenbrauen, schwarze Schuhe mit roter Sohle, Cargo-Tasche für Logistik. Hochformat: kleinere Tafeln und HUD.
+
+## Nach M8: Vorschläge (Plan ist abgeschlossen)
+- Leistung auf dem iPad prüfen (Rückmeldung von dir) und bei Bedarf Details sparen.
+- Lerntexte mit dem Team prüfen; weitere Fälle einfach in lerninhalte.js und kundenhilfe.js ergänzen.
+- Abzeichen pro Bereich (Bronze/Silber/Gold), freiwilliges Wissens-Quiz im Pausenraum.
+- Englischsprachige Kund:innen (z. B. US-Kund:innen aus Kaiserslautern) als eigene Fragen.
 
 ## Später (zurückgestellt)
 Zwei Währungen, Pausenraum-Upgrades.

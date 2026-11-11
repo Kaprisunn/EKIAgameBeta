@@ -1,31 +1,29 @@
 # Stand: EKIA Kaiserslautern
 
 **Spiel-Link:** https://claude.ai/artifact/RHUECknAuqPv52VwFmCeHA
-**Letzter Meilenstein:** M7 Multi-Blaster (fertig) · **Nächster:** M8 Mehr Lernfälle, Schicht & Feinschliff (PLAN.md)
+**Letzter Meilenstein:** M8 Mehr Lernfälle, Schicht & Feinschliff (fertig) · **Plan abgeschlossen**, Vorschläge in PLAN.md
 
 ## Was funktioniert
-- Drei Ebenen: Erdgeschoss, Obergeschoss (Treppe, Aufzug) und Parkplatz (Glasschiebetür am Ausgang EG ↔ Tür in der Fassade).
-  Nur die aktive Ebene wird gezeichnet; nach jedem Wechsel 0,9 s Sperre gegen Flackern.
-- Parkplatz: Fassade „EKIA KAISERSLAUTERN“, Gehweg, Parklinien, 20 bunte Autos, Hecken, Wagenboxen, Laternen, Spielplatz,
-  6 Kund:innen (auch mit ❓), ein Logistik-Kollege an der Wagenbox.
-- Wagen-Rallye: am Wagenhäuschen (🛒) starten, 5 Wagen in 30 s einsammeln (Kette folgt), Anzeige im blauen Funk-Streifen,
-  30 Punkte + 1 je Restsekunde. Bei Zeitablauf kein Verlust, neuer Versuch möglich.
-- Multi-Blaster: Station 🎯 vor der zweiten Wagenbox. 3 Wellen grummeliger Kund:innen laufen zum Eingang; 📡 Ring (Aktionsknopf/Leertaste)
-  und 🧆 Köttbullar (zweiter Knopf/K) machen sie glücklich (Herzchen, Tasche). 3 Punkte je Person, 15 Bonus. Getestet, max. 55 Draw Calls.
-- 12 Missionen (Ampel). Neu draußen: 🔴 „Wagen rollen weg“, 🟢 „Kofferraum-Tetris“ (Sortieren, jedes Shirt).
-- Charakter-Editor (Abteilung inkl. ComIn, P&C; Frau/Mann, Hautton, Alter mit Bart), Streifen-Shirts, Warnweste vor der Logistik,
-  Minispiele (Timing, Sortieren), Kundenfragen je Abteilung, NPCs, HUD, Haus-Funk wie zuvor.
-- Leistung im Test: EG 66 Draw Calls / ca. 68.000 Dreiecke (Budget 150 / 100.000).
-- Getestet: Tür in beide Richtungen, Rallye bis zum Sieg, Kofferraum-Mission startet.
+- Startmenü = Charakter-Editor (Abteilung inkl. ComIn, P&C; Frau/Mann, Hautton, jung/60+ mit Bart), auch an den Spinden.
+- Drei Ebenen: Erdgeschoss, Obergeschoss (Treppe, Aufzug), Parkplatz (Glasschiebetür). NPCs, Sprechblasen, Winken.
+- 14 Missionen im Ampel-System (Rot = Notfall für alle, Gelb, Grün mit Kleiderordnung). Minispiele: Auswahl, Timing
+  (Teppich scannen, Zweite Chance mit 3 Treffern), Sortieren (Regal, Kofferraum), Restaurant-Takt (3 Tabletts).
+- Kund:innen mit ❓ folgen kurz und stellen Fragen passend zur Abteilung. Warnweste vor der Logistik.
+- Parkplatz: Wagen-Rallye (5 Wagen in 30 s) und Multi-Blaster (3 Wellen, Ring und Köttbullar).
+- Schicht: 6 Minuten (Uhr im HUD, pausiert bei Tafeln, Rallye und Blaster), danach Schichtbericht mit 1–3 Sternen
+  (ab 35 / 80 Punkten), Werten und Lerntipp. Im Pausenmenü: Schicht beenden, Missionen zurücksetzen.
+- Figur: Streifen-Shirt, Ohren, Augenbrauen, schwarze Schuhe mit roter Sohle, Cargo-Tasche (Logistik), Schürze (Restaurant).
+- Hochformat: Menü zentriert, kleinere Tafeln, Hinweis zum Querhalten.
+- Leistung im Test: 55–65 Draw Calls, ca. 66.000–68.000 Dreiecke (Budget 150 / 100.000).
+- Getestet: Zweite Chance, Restaurant-Takt, Schichtbericht und neue Schicht.
 
 ## Technik-Notizen
-- Ebenen in karte.js (eg, og, pp); Außen-Ebene: aussen: true (Asphalt, Fassade statt Wänden), linien, tueren.
-- Möbel draußen: moebel-aussen.js (Autos mit Farbe je Instanz über `farben`). Rallye: rallye.js.
-- Blaster: blaster.js (Figuren werden beim ersten Start gebaut und wiederverwendet).
-- window.__test: etage(id, x, z), profil, weste, mission(id), rallye(), blaster(), feuer(art), fragende(), pos().
+- Inhalte: lerninhalte.js (Missionen), kundenhilfe.js (Kundenfragen), leute.js (NPCs), karte.js (Ebenen).
+- Minispiele: minispiele.js (auswahl, timing mit treffer/knopf, tablett, sortieren mit oben/unten, weste). Schicht: schicht.js.
+- window.__test: etage, profil, weste, mission, rallye, blaster, feuer, fragende, pos.
 
 ## Was fehlt
-- Mehr Lernfälle, Schichtbericht und Figur-Feinschliff (M8). Während Rallye/Blaster sind andere Interaktionen pausiert. Leistung auf dem iPad ungeprüft.
+- Leistung auf dem echten iPad ungeprüft. Lerntexte sind Beispiele und sollten vom Team geprüft werden.
 
 ## Bekannte Fehler
 - Kund:innen hängen manchmal kurz an Möbeln oder Autos. Hängende Schilder verdecken die Figur kurz beim Darunterlaufen.

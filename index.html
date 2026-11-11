@@ -107,6 +107,13 @@ body.dialog #aktion, body.dialog #aktion2, body.dialog #aktionText, body.dialog 
   cursor: pointer; touch-action: none; }
 .kiste.gewaehlt { outline: 4px solid var(--blau); outline-offset: 2px; }
 .kiste:disabled { cursor: default; }
+.bestellung { font-weight: 800; }
+.tablett { position: absolute; top: 4px; bottom: 4px; width: 18%; display: grid; place-items: center; border-radius: 12px;
+  background: #3e9e5b; color: var(--weiss); font-size: 22px; }
+.speisen { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 8px; }
+#bSterne { font-size: 44px; letter-spacing: .1em; }
+#bTipp { padding: 12px 16px; border-radius: 16px; background: #eef4fb; text-align: left; }
+@media (orientation: portrait) { #hud { font-size: 16px; } .tafel { padding: 22px 18px 18px; } }
 .regalhinweis { font-size: 18px; opacity: .7; text-align: center; }
 #aktionText { position: fixed; right: calc(28px + var(--rand-r)); bottom: calc(138px + var(--rand-u)); width: 96px; padding: 4px 0;
   border-radius: 14px; background: rgba(255, 255, 255, .92); color: var(--blau-tief); text-align: center; pointer-events: none; }
@@ -143,7 +150,15 @@ body.dialog #aktion, body.dialog #aktion2, body.dialog #aktionText, body.dialog 
   <h1>Pause</h1>
   <p>Kurz durchatmen. Die Halle wartet.</p>
   <button id="weiterKnopf" class="knopf" type="button">Weiter</button>
+  <button id="endeKnopf" class="knopf knopf-hell" type="button">Schicht beenden: Bericht ansehen</button>
   <button id="resetKnopf" class="knopf knopf-hell" type="button">Missionen zurücksetzen</button>
+</section>
+<section id="bericht" class="tafel" hidden>
+  <h1>Schichtbericht</h1>
+  <div id="bSterne"></div>
+  <p id="bWerte"></p>
+  <p id="bTipp"></p>
+  <button id="neueSchicht" class="knopf" type="button">Neue Schicht starten</button>
 </section>
 <section id="dialog" class="tafel" hidden aria-live="polite">
   <div id="dOrt"></div>
