@@ -32,7 +32,7 @@ const WOLKE = () => symbol((g) => {
 });
 const HERZ = () => symbol((g) => herzZeichen(g, 64, 70, 90));
 
-export function erstelleBlaster({ welt, ui, missionen }) {
+export function erstelleBlaster({ welt, ui, missionen, abzeichen }) {
   const gruppe = welt.etagen.pp.gruppe;
   let kunden = null, mats = null, aktiv = false, welle = 0, zuKommen = 0, spawnIn = 0, pauseIn = 0, snackIn = 0;
   let froh = 0, drin = 0, punkte = 0;
@@ -245,6 +245,8 @@ export function erstelleBlaster({ welt, ui, missionen }) {
         if (++welle < WELLEN.length) { zuKommen = WELLEN[welle]; spawnIn = 1; ui.toast(`Welle ${welle + 1} kommt!`, 2000); return; }
         const gesamt = WELLEN.reduce((a, b) => a + b, 0), bonus = drin === 0 ? 15 : 0;
         if (bonus) missionen.punkteDazu(bonus);
+        abzeichen?.zaehle('blaster');
+        if (!drin) abzeichen?.zaehle('perfekt');
         ton.richtig();
         ende(`Geschafft! ${froh} von ${gesamt} Kund:innen glücklich gemacht. +${punkte + bonus} Punkte${bonus ? ' (mit Bonus: niemand blieb grummelig)' : ''}.`);
       }

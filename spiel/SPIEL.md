@@ -240,3 +240,9 @@ bietet [Weste anlegen]. Danach trägt die Figur eine leuchtend gelbe Weste mit R
 vom Straßenrand zum Eingang. 📡 Barcode-Ring (Aktionsknopf, Leertaste): schnell, weit, mit leichter Zielhilfe in Blickrichtung.
 🧆 Köttbullar-Snack (zweiter Knopf, Taste K/Q): fliegt im Bogen, wirkt im Umkreis, 2,5 s Pause. Getroffene werden glücklich
 (Herzchen, blaue Tasche) und drehen um: je 3 Punkte, 15 Bonus, wenn niemand grummelig ankommt. Kein Verlieren.
+
+### 9.5 Abzeichen, Pausenraum-Quiz, Englisch (umgesetzt in M9)
+- Abzeichen Bronze/Silber/Gold für fünf Missions-Bereiche (lerninhalte.js GRUPPEN), Kundenprofi (3/8/15 Fragen), Parkplatz
+  (Rallye, Blaster, Blaster ohne Grummeln) und Wissen (Quiz). Anzeige im Pausenmenü und im Schichtbericht.
+- Pausenraum im OG zwischen Umkleide und Büro: Espresso-Station, Tisch, Quiz-Tafel. Wissens-Quiz: 3 Fragen, je 5 Punkte, einmal pro Schicht.
+- 🔶 Etwa jede dritte Kundenfrage kommt auf Englisch (kundenhilfe.js ENGLISCH), passend für US-Kund:innen in Kaiserslautern.

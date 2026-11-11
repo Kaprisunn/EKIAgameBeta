@@ -1,7 +1,7 @@
 // Kund:innen mit ❓-Symbol folgen dem Spieler kurz (npc.js). „Helfen“ öffnet eine Frage passend zur
 // eigenen Abteilung (kundenhilfe.js). Pro Etage höchstens zwei gleichzeitig.
 import * as THREE from 'three';
-import { HILFE } from './kundenhilfe.js';
+import { HILFE, ENGLISCH } from './kundenhilfe.js';
 import { PUNKTE } from './lerninhalte.js';
 import { auswahl } from './minispiele.js';
 
@@ -29,7 +29,7 @@ function frageMaterial() {
   return new THREE.SpriteMaterial({ map: textur, depthTest: false, fog: false, toneMapped: false });
 }
 
-export function erstelleKundenfragen({ welt, leute, ui, missionen }) {
+export function erstelleKundenfragen({ welt, leute, ui, missionen, abzeichen }) {
   const mat = frageMaterial(), plaetze = {}, benutzt = new Set();
   for (const [id, etage] of Object.entries(welt.etagen)) {
     plaetze[id] = [0, 1].map(() => {
@@ -61,7 +61,8 @@ export function erstelleKundenfragen({ welt, leute, ui, missionen }) {
     },
     // Frage passend zur Abteilung; jede Frage kommt erst wieder, wenn alle einmal dran waren
     starte(punkt, abteilung, fertig) {
-      const pool = HILFE[abteilung] ?? HILFE.verkauf;
+      // Etwa jede dritte Frage kommt auf Englisch, sonst passend zur Abteilung
+      const pool = Math.random() < 0.3 ? ENGLISCH : HILFE[abteilung] ?? HILFE.verkauf;
       let offen = pool.filter((q) => !benutzt.has(q));
       if (!offen.length) { pool.forEach((q) => benutzt.delete(q)); offen = pool; }
       const f = offen[Math.floor(Math.random() * offen.length)];
@@ -71,6 +72,7 @@ export function erstelleKundenfragen({ welt, leute, ui, missionen }) {
         if (!ok) { fehler++; melde({ richtig: false, text: `Noch nicht ganz. Denk-Tipp: ${f.tipp}` }); return; }
         const p = fehler ? Math.ceil(PUNKTE.kunde / 2) : PUNKTE.kunde;
         missionen.punkteDazu(p);
+        abzeichen?.zaehle('kunden');
         if (punkt.person) leute.bedanke(punkt.person);
         melde({ richtig: true, text: `Richtig! +${p} Punkte. ${f.warum}` });
       }), fertig);

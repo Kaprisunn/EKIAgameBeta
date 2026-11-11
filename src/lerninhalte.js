@@ -10,6 +10,15 @@ const P = Math.PI, R = Math.PI / 2;
 export const PUNKTE = { gruen: 10, gelb: 20, rot: 30, kunde: 10 };
 export const ART = { rot: { zeichen: '❗', name: 'Notfall' }, gelb: { zeichen: '🤝', name: 'Kollegenhilfe' }, gruen: { zeichen: '✅', name: 'Aufgabe' }, kunde: { zeichen: '❓', name: 'Kundenfrage' } };
 
+// Abzeichen-Bereiche (abzeichen.js): welche Missionen zu welchem Bereich gehören
+export const GRUPPEN = {
+  verkauf: { name: 'Verkauf & Kasse', zeichen: '🛋️', missionen: ['preisschild', 'mehrpaket', 'diebstahl', 'transport', 'reparatur'] },
+  logistik: { name: 'Logistik', zeichen: '📦', missionen: ['paletten', 'schwer'] },
+  restaurant: { name: 'Restaurant', zeichen: '🍽️', missionen: ['frische', 'takt'] },
+  sicherheit: { name: 'Sicherheit', zeichen: '🦺', missionen: ['pfuetze', 'karton', 'wagen'] },
+  team: { name: 'Team & Draußen', zeichen: '🤝', missionen: ['stau', 'kofferraum'] },
+};
+
 export const MISSIONEN = [
   {
     id: 'preisschild', art: 'gruen', zone: 'verkauf', etage: 'og', person: 'kunde', ort: [-13.2, -14.6, P],

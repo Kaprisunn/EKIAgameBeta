@@ -87,6 +87,8 @@ export const ETAGEN = {
       // Umkleide und Großraumbüro (hinter niedrigen Trennwänden)
       ['spinde', -12.8, 13.45], ['spiegel', -10.1, 13.45], ['kabine', -19.6, 18.5],
       ...[6, 11, 16, 21, 26].map((x) => ['schreibtische', x, 17]),
+      // Pausenraum zwischen Umkleide und Büro
+      ['tischgruppe', -4, 17.2], ['kaffee', -8.4, 16.5, R], ['quiztafel', -2, 14.2],
       ['pflanze', -30, -20], ['pflanze', 7, -20], ['pflanze', 12, -20], ['pflanze', 31, -2], ['pflanze', -30, 0],
       ['pflanze', 3.5, 20], ['pflanze', 30.5, 20], ['pflanze', -7, 19.5], ['pflanze', -23, 20],
     ],
@@ -100,6 +102,7 @@ export const ETAGEN = {
       ['Umkleide', -18, 2.65, 13.25, 0.45, 'weiss', 0.3],
       ['Großraumbüro', 13, 2.65, 13.25, 0.45, 'weiss', 0.3],
       ['👕 Spind', -12.8, 2.35, 13.75, 0.4, 'weiss'],
+      ['Pausenraum', -4, 3.1, 13.6, 0.45, 'weiss', 0.3, 0, true], ['🧠 Wissens-Quiz', -2, 1.45, 14.27, 0.32, 'gelb'],
       ['Treppe zum Erdgeschoss', TREPPE, 3.2, 14.6, 0.5, 'weiss', 0.4, 0, true],
       ['Aufzug', AUFZUG, 3.75, 10.08, 0.45, 'weiss'],
     ],
@@ -107,6 +110,7 @@ export const ETAGEN = {
       { art: 'treppe', x: TREPPE, z: 7.9, r: 1.2, ziel: 'eg', ankunft: [TREPPE, 15.6, 0] },
       { art: 'aufzug', x: AUFZUG, z: 11.3, r: 1.7, ziel: 'eg', ankunft: [AUFZUG, 11.6, 0] },
       { art: 'spind', x: -12.8, z: 14.9, r: 1.6 },
+      { art: 'quiz', x: -2, z: 15.4, r: 1.7 },
     ],
     pfeile: [[-29.4, 4], [-24, -11], [4, -12], [10, -4], [8, 8], [-6, 9], [-20, 6]],
   },

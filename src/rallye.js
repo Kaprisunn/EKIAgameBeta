@@ -19,7 +19,7 @@ function wagenGeometrie() {
   return verschmelzen(t);
 }
 
-export function erstelleRallye({ welt, ui, missionen }) {
+export function erstelleRallye({ welt, ui, missionen, abzeichen }) {
   const netz = new THREE.InstancedMesh(wagenGeometrie(), material('bunt'), ANZAHL);
   netz.castShadow = true;
   netz.frustumCulled = false;
@@ -75,6 +75,7 @@ export function erstelleRallye({ welt, ui, missionen }) {
       if (kette.length === ANZAHL) {
         const p = 30 + Math.floor(zeit);
         missionen.punkteDazu(p);
+        abzeichen?.zaehle('rallye');
         ton.richtig();
         ende(`Geschafft! Alle 5 Wagen in ${Math.round(ZEIT - zeit)} s. +${p} Punkte. Die Wagen stehen jetzt sicher in der Box.`);
       } else if (zeit <= 0) {
