@@ -5,10 +5,10 @@ import { MISSIONEN, PUNKTE } from './lerninhalte.js';
 import { material, teil, quader } from './formen.js';
 import { FARBE } from './daten.js';
 import { speicher } from './zustand.js';
-import { auswahl, timing, sortieren } from './minispiele.js';
+import { auswahl, timing, sortieren, tablett } from './minispiele.js';
 
 const NOETIG = { verkauf: 'gelb', logistik: 'blau' };
-const SPIELE = { auswahl, timing, sortieren };
+const SPIELE = { auswahl, timing, sortieren, tablett };
 const SHIRT_NAME = { gelb: 'das gelbe Streifen-Shirt (Verkauf)', blau: 'das blaue Streifen-Shirt (Logistik, Restaurant, ComIn, P&C)' };
 
 // Drei glänzende Symbole in einer kleinen, selbst gezeichneten Textur (je 128 × 128 Pixel)

@@ -28,6 +28,7 @@ function steckbrief(kollege, rolle) {
     streifen: kollege ? (blau ? 0x003a75 : 0xd9a400) : null,
     hose: kollege ? (rolle === 'logistik' ? 0x1e2f55 : 0x2b2b30) : zufall(HOSEN),
     schild: kollege ? (blau ? FARBE.gelb : FARBE.blau) : null, schuerze: kollege && rolle === 'gastro', weste: kollege && rolle === 'logistik',
+    sohle: kollege ? 0xd9362b : null, cargo: kollege && rolle === 'logistik',
     bart: haare === 0x9a9a9a && (frisur === 'kurz' || frisur === 'glatze') && Math.random() < 0.6,
     tasche: !kollege && Math.random() < 0.5 ? zufall([FARBE.gelb, FARBE.blau]) : null,
     groesse: 0.9 + Math.random() * 0.14, umriss: false, einfach: true,

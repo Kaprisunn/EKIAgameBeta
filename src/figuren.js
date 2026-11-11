@@ -64,6 +64,11 @@ export function baueFigur(s) {
     [() => kugel(0.08, n(8), n(6)), FARBE.wange, [-0.3, -0.13, 0.4], [0, -0.6, 0], [1, 0.6, 0.45], false],
     [() => kugel(0.08, n(8), n(6)), FARBE.wange, [0.3, -0.13, 0.4], [0, 0.6, 0], [1, 0.6, 0.45], false],
     [() => ring(0.085, 0.022, Math.PI), FARBE.mund, [0, -0.19, 0.475], [0.25, 0, Math.PI], [1, 1, 1], false],
+    // Ohren und Augenbrauen (Brauen in Haarfarbe, deutlich vor der Stirn)
+    [() => kugel(0.11, n(8), n(6)), s.haut, [-0.5, -0.02, -0.02], [0, 0, 0], [0.6, 1, 0.8]],
+    [() => kugel(0.11, n(8), n(6)), s.haut, [0.5, -0.02, -0.02], [0, 0, 0], [0.6, 1, 0.8]],
+    [() => quader(0.17, 0.045, 0.05), s.haare, [-0.19, 0.25, 0.44], [0, -0.35, 0.12], [1, 1, 1], false],
+    [() => quader(0.17, 0.045, 0.05), s.haare, [0.19, 0.25, 0.44], [0, 0.35, -0.12], [1, 1, 1], false],
     ...frisur(s),
     // Vollbart (deutlich vor dem Gesicht) mit Schnurrbart
     ...(s.bart ? [[() => kugel(0.34, n(12), n(9)), s.haare, [0, -0.47, 0.2], [0, 0, 0], [1.15, 0.8, 0.7]],
@@ -98,6 +103,9 @@ export function baueFigur(s) {
     g.add(baueNetz([
       [() => kapsel(0.15, 0.34, n(10)), s.hose, [0, -0.33, 0]],
       [() => kugel(0.17, n(10), n(7)), s.schuhe, [0, -0.66, 0.07], [0, 0, 0], [1, 0.62, 1.4]],
+      // Sohle (Mitarbeiter:innen: rot) und Cargo-Seitentasche (Logistik)
+      [() => quader(0.3, 0.05, 0.46), s.sohle ?? s.schuhe, [0, -0.745, 0.07], [0, 0, 0], [1, 1, 1], false],
+      ...(s.cargo ? [[() => quader(0.07, 0.17, 0.2), 0x16233f, [seite * 0.155, -0.3, 0.02], [0, 0, 0], [1, 1, 1], false]] : []),
     ], opt));
     return g;
   };

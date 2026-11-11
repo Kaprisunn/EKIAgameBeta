@@ -12,6 +12,7 @@ import { erstelleMissionen } from './missionen.js';
 import { erstelleKundenfragen } from './kundenfragen.js';
 import { erstelleRallye } from './rallye.js';
 import { erstelleBlaster } from './blaster.js';
+import { erstelleSchicht } from './schicht.js';
 import { erstelleEditor } from './editor.js';
 import { weste } from './minispiele.js';
 import { ABTEILUNGEN } from './daten.js';
@@ -47,7 +48,7 @@ function starte() {
   let neuZeichnen = true, tafelOffen = false;
 
   const hud = () => ui.hud({ def: welt.etage.def, shirt: shirt(), abteilung: ABTEILUNGEN[profil.abteilung].name,
-    punkte: missionen.punkte, erledigt: missionen.erledigt, gesamt: missionen.gesamt });
+    punkte: missionen.punkte, erledigt: missionen.erledigt, gesamt: missionen.gesamt, rest: schicht.rest });
   function kleiden(effekt = true) {
     spieler.setze(steckbriefAus(profil), effekt);
     const { weste: _, ...gespeichert } = profil;
@@ -120,12 +121,15 @@ function starte() {
     pause: umschaltenPause,
     aktion,
     aktion2: () => { if (zustand.get() === Z.SPIEL && blaster.aktiv && !tafelOffen) blaster.feuer('snack', spieler.pos, spieler.blick); },
-    zuruecksetzen: () => { missionen.zuruecksetzen(); hud(); ui.toast('Alle Missionen sind wieder offen.'); },
+    zuruecksetzen: () => { missionen.zuruecksetzen(); schicht.neu(); hud(); ui.toast('Alle Missionen sind wieder offen.'); },
+    beenden: () => zustand.setze(Z.ENDE),
+    neueSchicht: () => { schicht.neu(); hud(); zustand.setze(Z.SPIEL); ui.toast('Neue Schicht: 6 Minuten. Viel Erfolg!'); },
   });
   const missionen = erstelleMissionen({ welt, leute, ui });
   const kundenfragen = erstelleKundenfragen({ welt, leute, ui, missionen });
   const rallye = erstelleRallye({ welt, ui, missionen });
   const blaster = erstelleBlaster({ welt, ui, missionen });
+  const schicht = erstelleSchicht({ missionen });
   // Neue Abteilung = neue Kleidung, die Warnweste muss dann neu angelegt werden
   erstelleEditor(document.getElementById('editor'), profil, (feld) => {
     if (feld === 'abteilung') profil.weste = false;
@@ -137,7 +141,7 @@ function starte() {
     pause: umschaltenPause,
     start: () => { if (zustand.get() === Z.MENUE) zustand.setze(Z.SPIEL); },
   });
-  zustand.beiWechsel((neu) => { ui.zeige(neu); eingabe.zuruecksetzen(); neuZeichnen = true; if (neu === Z.SPIEL && !tafelOffen) kam.seitlich(0); });
+  zustand.beiWechsel((neu) => { if (neu === Z.ENDE) ui.bericht(schicht.bericht()); ui.zeige(neu); eingabe.zuruecksetzen(); neuZeichnen = true; if (neu === Z.SPIEL && !tafelOffen) kam.seitlich(0); });
   ui.zeige(Z.MENUE);
   if (BREIT()) kam.seitlich(-4.5);
   hud();
@@ -167,7 +171,7 @@ function starte() {
     pos: () => [Math.round(spieler.pos.x * 10) / 10, Math.round(spieler.pos.z * 10) / 10],
     mission: (id) => missionen.starte(id, shirt(), missionFertig) && (tafelOffen = true),
   };
-  let letzte = performance.now(), messZeit = 0, messBilder = 0, letztePunkte = -1;
+  let letzte = performance.now(), messZeit = 0, messBilder = 0, letztePunkte = -1, letzteSekunde = -1;
 
   // Sprechblase über dem Kopf: 3D-Punkt in Bildschirmkoordinaten umrechnen
   const kopf = new THREE.Vector3();
@@ -185,10 +189,11 @@ function starte() {
       const z = zustand.get();
       info.zustand = z;
       info.etage = welt.etage.id;
-      if (z === Z.PAUSE && !neuZeichnen) return;
+      const steht = z === Z.PAUSE || z === Z.ENDE;
+      if (steht && !neuZeichnen) return;
       neuZeichnen = false;
 
-      if (z !== Z.PAUSE) {
+      if (!steht) {
         spieler.update(dt, eingabe.richtung(), z === Z.SPIEL && !tafelOffen);
         leute.update(dt, welt.etage.id, spieler.pos);
         leute.schiebeSpieler(spieler.pos);
@@ -202,7 +207,10 @@ function starte() {
           ui.blaster(blaster.aktiv);
           const spiel = rallye.aktiv ? rallye.text : blaster.aktiv ? blaster.text : null;
           ui.funk(spiel ?? funk, !!spiel);
-          if (missionen.punkte !== letztePunkte) { letztePunkte = missionen.punkte; hud(); }
+          // Schichtuhr läuft nur ohne offene Tafel; HUD nur bei neuer Sekunde oder neuen Punkten neu zeichnen
+          if (!tafelOffen && !rallye.aktiv && !blaster.aktiv && schicht.update(dt)) zustand.setze(Z.ENDE);
+          const sekunde = Math.floor(schicht.rest);
+          if (missionen.punkte !== letztePunkte || sekunde !== letzteSekunde) { letztePunkte = missionen.punkte; letzteSekunde = sekunde; hud(); }
         }
         kam.folge(spieler.pos, spieler.tempo, dt);
         welt.folgeSonne(spieler.pos);

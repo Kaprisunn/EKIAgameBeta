@@ -3,7 +3,8 @@
 // zone:  verkauf = gelbes Shirt, logistik = blaues Shirt (Lager und Restaurant), buero und aussen = beide Farben
 // ort:   [x, z, blickrichtung] der Person bzw. Gefahrenstelle; knopf = anderer Interaktionspunkt
 // person: 'kunde' oder 'kollege' (rolle bestimmt die Kleidung), gefahr: 'pfuetze' oder 'karton'
-// typ:   auswahl (3 Antworten, Standard), timing (im richtigen Moment scannen), sortieren (Kartons tauschen)
+// typ:   auswahl (3 Antworten, Standard), timing (im richtigen Moment auslösen, treffer = Anzahl), sortieren (tauschen),
+//        tablett (bestellte Speisen auf vorbeigleitende Tabletts legen)
 const P = Math.PI, R = Math.PI / 2;
 
 export const PUNKTE = { gruen: 10, gelb: 20, rot: 30, kunde: 10 };
@@ -125,5 +126,22 @@ export const MISSIONEN = [
     kisten: [['Kissen', 2], ['Regal-Paket', 22], ['Lampe', 4], ['Kommoden-Paket', 30]], oben: '⬆ oben im Kofferraum', unten: '⬇ Kofferraumboden',
     warum: 'Schwere, flache Pakete liegen unten sicher und rutschen beim Bremsen nicht. Leichtes oben wird nicht zerdrückt.',
     tipp: 'Das schwerste Paket gehört ganz nach unten.',
+  },
+  {
+    id: 'reparatur', art: 'gruen', zone: 'verkauf', etage: 'eg', person: 'kollege', rolle: 'verkauf', ort: [8.2, -1.4, Math.PI], typ: 'timing',
+    treffer: 3, knopf: '🔧 Festdrehen!', titel: 'Zweite Chance', bereich: 'Fundgrube',
+    text: 'Ein Ausstellungsstuhl wackelt. Mit dem Inbusschlüssel ziehst du drei Schrauben nach, dann bekommt er das gelbe Zweite-Chance-Preisschild.',
+    frage: 'Tippe dreimal auf „Festdrehen!“, wenn der Laser im grünen Feld steht.',
+    warum: 'Reparieren statt wegwerfen: Gut gemachte Stücke bekommen in der Fundgrube eine zweite Chance. Das spart Abfall und freut Kund:innen.',
+    tipp: 'Ruhig bleiben und warten, bis der Laser genau im grünen Feld steht.',
+  },
+  {
+    id: 'takt', art: 'gruen', zone: 'logistik', etage: 'og', person: 'kollege', rolle: 'gastro', ort: [17, -19.9, 0], typ: 'tablett',
+    titel: 'Restaurant-Takt', bereich: 'Restaurant',
+    text: 'Mittags-Ansturm! Die Tabletts der Gäste gleiten durch die Ausgabe.',
+    frage: 'Tippe die drei bestellten Speisen an, bevor das Tablett durchgerutscht ist.',
+    speisen: [['🧆', 'Köttbullar'], ['🥦', 'Gemüsebällchen'], ['🥣', 'Rahmsoße'], ['🍒', 'Preiselbeeren'], ['🍟', 'Pommes']],
+    warum: 'Genau nach Bestellung und im Takt: So bekommt jeder Gast das Richtige, und die Schlange bleibt kurz.',
+    tipp: 'Lies die Bestellung oben und tippe nur diese drei Speisen an.',
   },
 ];

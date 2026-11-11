@@ -12,7 +12,7 @@ export function steckbriefAus(p) {
   return {
     haut: HAUTTOENE[p.haut], haare: alt ? 0xf4f4f4 : HAARE_JUNG[p.haut], frisur: frau ? (alt ? 'dutt' : 'zopf') : 'kurz', bart: !frau && alt,
     shirt: s.shirt, streifen: s.streifen, schild: s.schild, hose: p.abteilung === 'logistik' ? 0x1e2f55 : 0x2b2b30,
-    schuhe: FARBE.umriss, schuerze: p.abteilung === 'restaurant', weste: p.weste, groesse: frau ? 0.96 : 1, umriss: true,
+    schuhe: 0x1f1f1f, sohle: 0xd9362b, cargo: p.abteilung === 'logistik', schuerze: p.abteilung === 'restaurant', weste: p.weste, groesse: frau ? 0.96 : 1, umriss: true,
   };
 }
 const WIRBEL_DAUER = 0.45;
