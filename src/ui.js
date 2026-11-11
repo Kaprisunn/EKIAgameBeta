@@ -7,15 +7,15 @@ import { ART } from './lerninhalte.js';
 const $ = (id) => document.getElementById(id);
 const AKTION = { rot: ['❗', 'Notfall'], gelb: ['🤝', 'Helfen'], gruen: ['✅', 'Aufgabe'] };
 
-export function erstelleUI({ start, weiter, pause, aktion, zuruecksetzen }) {
+export function erstelleUI({ start, weiter, pause, aktion, aktion2, zuruecksetzen }) {
   const el = {
     menue: $('menue'), pause: $('pause'), joy: $('joyzone'), aktion: $('aktion'), aktionText: $('aktionText'), pauseKnopf: $('pauseKnopf'),
     start: $('startKnopf'), toast: $('toast'), blende: $('blende'), hud: $('hud'), funk: $('funk'), blase: $('blase'), reset: $('resetKnopf'),
     dialog: $('dialog'), dTitel: $('dTitel'), dOrt: $('dOrt'), dText: $('dText'), dFrage: $('dFrage'), dBox: $('dAntworten'),
-    dRueck: $('dRueck'), dWeiter: $('dWeiter'),
+    dRueck: $('dRueck'), dWeiter: $('dWeiter'), aktion2: $('aktion2'),
   };
   const tippen = (knopf, f) => knopf.addEventListener('pointerdown', (e) => { e.preventDefault(); e.stopPropagation(); f(); });
-  let toastUhr = 0, aktionArt = null, dialogAktiv = false, dialogFertig = null, umkleideFertig = null, resetBereit = false;
+  let toastUhr = 0, aktionArt = null, dialogAktiv = false, dialogFertig = null, umkleideFertig = null, resetBereit = false, blasterAn = false;
 
   // Startknopf: im Startmenü „Schicht starten“, in der Umkleide „Fertig“
   tippen(el.start, () => {
@@ -33,6 +33,7 @@ export function erstelleUI({ start, weiter, pause, aktion, zuruecksetzen }) {
   tippen($('weiterKnopf'), () => { ton.klick(); weiter(); });
   tippen(el.pauseKnopf, () => { ton.klick(); pause(); });
   tippen(el.aktion, aktion);
+  tippen(el.aktion2, aktion2);
   // Zurücksetzen braucht zwei Tipper (Dialoge wie confirm() gibt es im Spiel-Link nicht)
   tippen(el.reset, () => {
     ton.klick();
@@ -70,6 +71,7 @@ export function erstelleUI({ start, weiter, pause, aktion, zuruecksetzen }) {
       el.pause.hidden = zustand !== Z.PAUSE;
       el.hud.hidden = zustand === Z.MENUE;
       el.joy.hidden = el.aktion.hidden = el.pauseKnopf.hidden = !spiel;
+      el.aktion2.hidden = !spiel || !blasterAn;
       el.aktionText.hidden = !spiel || !el.aktionText.textContent;
       el.dialog.hidden = !(spiel && dialogAktiv);
       if (!spiel) { el.blase.hidden = true; el.funk.hidden = true; resetBereit = false; el.reset.textContent = 'Missionen zurücksetzen'; }
@@ -93,6 +95,12 @@ export function erstelleUI({ start, weiter, pause, aktion, zuruecksetzen }) {
       symbol.textContent = '👕';
       el.hud.replaceChildren(symbol, ` ${abteilung} · ${def.kurz}   ⭐ ${punkte}   ✔ ${erledigt}/${gesamt}`);
     },
+    // Zweiter Knopf (🧆 Köttbullar) nur während des Multi-Blasters
+    blaster(an) {
+      if (an === blasterAn) return;
+      blasterAn = an;
+      el.aktion2.hidden = !an;
+    },
     // Funk-Streifen oben: rot für Notfälle, blau für die Wagen-Rallye
     funk(text, blau = false) {
       el.funk.hidden = !text;
@@ -105,7 +113,7 @@ export function erstelleUI({ start, weiter, pause, aktion, zuruecksetzen }) {
       if (art === aktionArt) return;
       aktionArt = art;
       const [symbol, text] = !p ? ['👋', ''] : p.art === 'aufzug' ? [p.ziel === 'og' ? '⬆️' : '⬇️', 'Aufzug']
-        : p.art === 'spind' ? ['👕', 'Umkleide'] : p.art === 'kunde' ? ['❓', 'Helfen'] : p.art === 'rallye' ? ['🛒', 'Rallye'] : p.art === 'mission' ? AKTION[p.farbe] : ['❗', ''];
+        : p.art === 'spind' ? ['👕', 'Umkleide'] : p.art === 'kunde' ? ['❓', 'Helfen'] : p.art === 'rallye' ? ['🛒', 'Rallye'] : p.art === 'blaster' ? ['🎯', 'Blaster'] : p.art === 'feuer' ? ['📡', 'Ring'] : p.art === 'mission' ? AKTION[p.farbe] : ['❗', ''];
       el.aktion.textContent = symbol;
       el.aktion.setAttribute('aria-label', text || 'Winken');
       el.aktionText.textContent = text;

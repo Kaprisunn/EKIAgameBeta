@@ -47,6 +47,7 @@ export function erstelleSpieler(szene, welt, steckbrief) {
   return {
     pos,
     tempo,
+    get blick() { return blickwinkel; },
     winken() { starteWinken(anim); ton.winken(); },
     // Versetzt die Figur (Etagenwechsel); dreh = Blickrichtung (0 = zur Kamera)
     teleport(x, z, dreh = 0) {

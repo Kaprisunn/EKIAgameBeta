@@ -234,3 +234,9 @@ bietet [Weste anlegen]. Danach trägt die Figur eine leuchtend gelbe Weste mit R
 2. Regal-Sicherheit (Logistik): Kartons tauschen, bis schwere unten und leichte oben stehen.
 3. Kund:innen mit ❓ folgen dem Spieler kurz; „Helfen“ stellt eine Frage passend zur eigenen Abteilung (src/kundenhilfe.js).
 4. Wagen-Rallye (Parkplatz): 5 Einkaufswagen in 30 Sekunden einsammeln (kommt mit dem Parkplatz).
+
+### 9.4 Multi-Blaster (umgesetzt in M7)
+🔶 Start an der Station vor der zweiten Wagenbox (🎯). Drei Wellen (4, 6, 8) grummeliger Kund:innen in Rot mit Grummel-Wolke laufen
+vom Straßenrand zum Eingang. 📡 Barcode-Ring (Aktionsknopf, Leertaste): schnell, weit, mit leichter Zielhilfe in Blickrichtung.
+🧆 Köttbullar-Snack (zweiter Knopf, Taste K/Q): fliegt im Bogen, wirkt im Umkreis, 2,5 s Pause. Getroffene werden glücklich
+(Herzchen, blaue Tasche) und drehen um: je 3 Punkte, 15 Bonus, wenn niemand grummelig ankommt. Kein Verlieren.

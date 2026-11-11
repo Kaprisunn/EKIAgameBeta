@@ -2,7 +2,7 @@
 // richtung() liefert {x, z} mit Länge 0 bis 1 (Bildschirm oben = Welt -z).
 const RADIUS = 62, TOTZONE = 0.12;
 
-export function erstelleEingabe({ aktion, pause, start }) {
+export function erstelleEingabe({ aktion, aktion2, pause, start }) {
   const zone = document.getElementById('joyzone');
   const basis = zone.querySelector('.joy-basis'), knopf = zone.querySelector('.joy-knopf');
   const tasten = new Set();
@@ -48,6 +48,7 @@ export function erstelleEingabe({ aktion, pause, start }) {
     if (BEWEGUNG[e.code]) { tasten.add(e.code); e.preventDefault(); return; }
     if (e.repeat) return;
     if (e.code === 'Space' || e.code === 'KeyE' || e.code === 'KeyU') { e.preventDefault(); aktion(); }
+    else if (e.code === 'KeyK' || e.code === 'KeyQ') aktion2?.();
     else if (e.code === 'Escape' || e.code === 'KeyP') pause();
     else if (e.code === 'Enter') start();
   });

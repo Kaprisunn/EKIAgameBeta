@@ -126,11 +126,13 @@ export const ETAGEN = {
       ['EKIA KAISERSLAUTERN', -6, 4.6, -21.95, 1.7, 'blau'],
       ['Eingang · Ausgang', 12, 3.3, -21.32, 0.42, 'gelb'],
       ['🛒 Wagen-Rallye', -13.5, 3.1, -13.3, 0.45, 'gelb', 0.3],
+      ['🎯 Multi-Blaster', 16.5, 3.1, 3.7, 0.45, 'gelb', 0.3],
       ['Spielplatz', -23, 2.9, 15.8, 0.45, 'weiss', 0.3],
     ],
     punkte: [
       { art: 'tuer', x: 12, z: -21.1, r: 0.9, ziel: 'eg', ankunft: [12, 18.6, Math.PI] },
       { art: 'rallye', x: -13.5, z: -14.4, r: 1.8 },
+      { art: 'blaster', x: 16.5, z: 2.4, r: 1.8 },
     ],
     pfeile: [[12, -19.5], [12, -14.8], [-10, -14.8]],
   },

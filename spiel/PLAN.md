@@ -28,10 +28,9 @@ Parklinien, 20 Autos, Berberitzen-Hecken, 2 Wagenboxen, Laternen, Spielplatz. Gl
 Sperre gegen Flackern). Wagen-Rallye (rallye.js): 5 Wagen in 30 s einsammeln, sie hängen sich als Kette an. Missionen „Wagen rollen weg“
 (jetzt draußen) und „Kofferraum-Tetris“ (Sortier-Minispiel). Kund:innen und ein Kollege auf dem Parkplatz.
 
-### M7 – Multi-Blaster ⬜
-(5, 8.1)
-- 🔶 Start an einer Station am Wagen-Häuschen. Wellen grummeliger Kund:innen, Barcode-Ring und Köttbullar-Snack,
-  Treffer → glücklich mit Herzchen und Tasche, Punkte. ⚠️ Höchstens 20 Kund:innen, Partikel-Pool für Herzchen.
+### M7 – Multi-Blaster ✅
+(5, 9.4) blaster.js: Station vor der zweiten Wagenbox, 3 Wellen grummeliger Kund:innen (rot, Grummel-Wolke), 📡 Barcode-Ring und
+🧆 Köttbullar-Snack (zweiter Knopf), Herzchen-Partikel, blaue Tasche, Umkehren, Punkte und Bonus. Zähler im blauen Funk-Streifen.
 
 ### M8 – Mehr Lernfälle, Schicht & Feinschliff ⬜
 (6.2, 6.3, 8.3)
