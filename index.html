@@ -68,6 +68,7 @@ body {
   padding: 10px 20px; border-radius: 22px; background: var(--rot); color: var(--weiss); box-shadow: 0 5px 0 #8f1f16; pointer-events: none;
   text-align: center; animation: funk 1.6s ease-in-out infinite; }
 @keyframes funk { 50% { filter: brightness(1.15); } }
+#funk.blau { background: var(--blau); box-shadow: 0 5px 0 var(--blau-tief); font-variant-numeric: tabular-nums; }
 @media (max-width: 1150px) { #funk { top: calc(78px + var(--rand-o)); max-width: calc(100vw - 32px); } #toast { top: calc(158px + var(--rand-o)); } }
 #dialog { width: min(600px, calc(100vw - 32px)); max-height: calc(100dvh - 32px); overflow: auto; text-align: left; gap: 12px; z-index: 4;
   border-top: 10px solid var(--gruen); }

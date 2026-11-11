@@ -64,8 +64,8 @@ export function sortieren(box, m, pruefe) {
   const stapel = document.createElement('div'), oben = document.createElement('div'), unten = document.createElement('div');
   stapel.className = 'stapel';
   oben.className = unten.className = 'regalhinweis';
-  oben.textContent = '⬆ oberes Fach';
-  unten.textContent = '⬇ unteres Fach (Boden)';
+  oben.textContent = m.oben ?? '⬆ oberes Fach';
+  unten.textContent = m.unten ?? '⬇ unteres Fach (Boden)';
   const geordnet = () => reihe.every((k, i) => i === 0 || reihe[i - 1].kg <= k.kg);
   function zeichne() {
     stapel.replaceChildren(...reihe.map((k, i) => {

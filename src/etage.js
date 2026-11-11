@@ -5,9 +5,11 @@ import { material, teil, verschmelzen, baueViele, quader, zylinder } from './for
 import { MOEBEL } from './moebel.js';
 import { MOEBEL_OG } from './moebel-og.js';
 import { MOEBEL_DEKO } from './moebel-deko.js';
+import { MOEBEL_AUSSEN } from './moebel-aussen.js';
 import { FARBE as F, HALLE } from './daten.js';
 
-const ALLE = { ...MOEBEL, ...MOEBEL_OG, ...MOEBEL_DEKO };
+const ALLE = { ...MOEBEL, ...MOEBEL_OG, ...MOEBEL_DEKO, ...MOEBEL_AUSSEN };
+const GLAS = new THREE.MeshBasicMaterial({ color: 0xcfe9f7, transparent: true, opacity: 0.5, depthWrite: false });
 const B = HALLE.breite / 2, T = HALLE.tiefe / 2, m4 = new THREE.Matrix4();
 const Q = (b, h, t) => () => quader(b, h, t);
 
@@ -31,8 +33,13 @@ function boden(def) {
   const p = geo.attributes.position, farben = new Float32Array(p.count * 3), c = new THREE.Color();
   for (let i = 0; i < p.count; i += 3) {
     const mx = (p.getX(i) + p.getX(i + 1) + p.getX(i + 2)) / 3, mz = (p.getZ(i) + p.getZ(i + 1) + p.getZ(i + 2)) / 3;
-    const muster = def.dielen ? Math.floor(mz / 2) % 2 : (Math.floor(mx / 2) + Math.floor(mz / 2)) % 2;
-    c.set(def.boden).multiplyScalar((muster ? (def.dielen ? 0.9 : 0.95) : 1) * (0.975 + Math.random() * 0.035));
+    if (def.aussen) {
+      // Parkplatz: heller Gehweg vor der Fassade, sonst Asphalt mit leichter Körnung
+      c.set(mz < def.gehweg ? 0xb9bcc0 : def.boden).multiplyScalar(0.95 + Math.random() * 0.07);
+    } else {
+      const muster = def.dielen ? Math.floor(mz / 2) % 2 : (Math.floor(mx / 2) + Math.floor(mz / 2)) % 2;
+      c.set(def.boden).multiplyScalar((muster ? (def.dielen ? 0.9 : 0.95) : 1) * (0.975 + Math.random() * 0.035));
+    }
     for (let j = 0; j < 3; j++) farben.set([c.r, c.g, c.b], (i + j) * 3);
   }
   geo.setAttribute('color', new THREE.BufferAttribute(farben, 3));
@@ -46,14 +53,34 @@ function boden(def) {
 function waende(def, statisch, kaesten) {
   const h = HALLE.wandHoehe, d = HALLE.wandDicke, band = 0.7;
   const wand = (x, z, b, t) => [[Q(b, h - band, t), F.wand, [x, (h - band) / 2, z]], [Q(b + 0.06, band, t + 0.06), F.blau, [x, h - band / 2, z]]];
+  // Parkplatz: nur die blaue Hausfassade im Norden (höher, mit gelbem Band), keine Seitenwände
+  const fassade = [[Q(HALLE.breite + 2 * d, 6, d), F.blau, [0, 3, -T - d / 2]], [Q(HALLE.breite + 2 * d + 0.06, 0.5, d + 0.06), F.gelb, [0, 5.75, -T - d / 2]]];
   const teile = [
     [Q(HALLE.breite + 1.2, 0.8, HALLE.tiefe + 1.2), F.birke, [0, -0.4, 0]],
     [Q(HALLE.breite + 1.3, 0.12, HALLE.tiefe + 1.3), F.birkeDunkel, [0, -0.06, 0]],
-    ...wand(0, -T - d / 2, HALLE.breite + 2 * d, d), ...wand(-B - d / 2, 0, d, HALLE.tiefe), ...wand(B + d / 2, 0, d, HALLE.tiefe),
+    ...(def.aussen ? fassade : [...wand(0, -T - d / 2, HALLE.breite + 2 * d, d), ...wand(-B - d / 2, 0, d, HALLE.tiefe), ...wand(B + d / 2, 0, d, HALLE.tiefe)]),
   ];
   if (def.sockel) teile.push([Q(HALLE.breite + 1.2, def.sockel, HALLE.tiefe + 1.2), F.blau, [0, -0.8 - def.sockel / 2, 0]]);
   lege(statisch, teile, 0, 0);
   kaesten.push([-B - 2, -T - 2, B + 2, -T], [-B - 2, -T, -B, T + 2], [B, -T, B + 2, T + 2], [-B, T - 0.6, B, T + 2]);
+}
+
+// Weiße Parklinie von (x1, z1) nach (x2, z2)
+function linie(statisch, [x1, z1, x2, z2]) {
+  lege(statisch, [[Q(0.12, 0.02, Math.hypot(x2 - x1, z2 - z1)), F.weiss, [0, 0.025, 0]]], (x1 + x2) / 2, (z1 + z2) / 2, Math.atan2(x2 - x1, z2 - z1));
+}
+
+// Glasschiebetür: zwei Glasflügel in einem Rahmen (Möbeltyp „tor“), die zur Seite gleiten, wenn jemand davorsteht
+function schiebetuer(gruppe, { x, z, dreh = 0 }) {
+  const halter = new THREE.Group(), geo = new THREE.BoxGeometry(2.0, 2.9, 0.08);
+  const links = new THREE.Mesh(geo, GLAS), rechts = new THREE.Mesh(geo, GLAS);
+  links.position.set(-1, 1.45, 0);
+  rechts.position.set(1, 1.45, 0);
+  halter.position.set(x, 0, z);
+  halter.rotation.y = dreh;
+  halter.add(links, rechts);
+  gruppe.add(halter);
+  return { x, z, links, rechts, auf: 0 };
 }
 
 // Gelb-schwarzer Zaun von (x1, z1) nach (x2, z2), achsenparallel
@@ -116,12 +143,14 @@ export function baueEtage(id, def, schilder) {
   for (const [typ, stellen] of Object.entries(nachTyp)) {
     const m = ALLE[typ];
     if (!m) throw new Error('Unbekanntes Möbel in karte.js: ' + typ);
-    if (m.viele && stellen.length > 2) gruppe.add(baueViele(m.teile, stellen));
+    if (m.viele && stellen.length > 2) gruppe.add(baueViele(m.teile, stellen, { farben: m.farben }));
     else stellen.forEach(([x, z, dreh]) => lege(statisch, m.teile, x, z, dreh));
     stellen.forEach(([x, z, dreh]) => (m.fuss ?? []).forEach((f) => kasten(kaesten, x, z, dreh, f)));
   }
   (def.zaeune ?? []).forEach((s) => zaun(statisch, kaesten, s));
   (def.trennwaende ?? []).forEach((w) => trennwand(statisch, kaesten, w));
+  (def.linien ?? []).forEach((l) => linie(statisch, l));
+  const tueren = (def.tueren ?? []).map((t) => schiebetuer(gruppe, t));
   const s = def.schranke, arm = s ? schranke(gruppe, statisch, s) : null;
   const schildNetz = schilder.baue(def.schilder, statisch);
 
@@ -136,6 +165,12 @@ export function baueEtage(id, def, schilder) {
     get sperre() { return arm && arm.rotation.z < 1.0 ? sperre : null; },
     // Schranke öffnet für Logistik; hinaus kommt man immer (innen = abgesperrter Bereich)
     update(dt, pos, rolle) {
+      for (const t of tueren) {
+        const nah = Math.hypot(pos.x - t.x, pos.z - t.z) < 4;
+        t.auf += ((nah ? 1 : 0) - t.auf) * (1 - Math.exp(-8 * dt));
+        t.links.position.x = -1 - t.auf * 1.85;
+        t.rechts.position.x = 1 + t.auf * 1.85;
+      }
       if (!arm) return;
       const nah = Math.hypot(pos.x - (sperre[0] + sperre[2]) / 2, pos.z - (sperre[1] + sperre[3]) / 2) < 3.5;
       const [ix1, iz1, ix2, iz2] = s.innen, drinnen = pos.x > ix1 && pos.x < ix2 && pos.z > iz1 && pos.z < iz2;

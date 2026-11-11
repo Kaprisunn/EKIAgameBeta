@@ -153,7 +153,7 @@ export function erstelleMissionen({ welt, leute, ui }) {
         e.marker.scale.setScalar(1.05 + Math.sin(t * 6 + z) * 0.06);
         if (e.m.art !== 'rot') continue;
         const hier = e.m.etage === etageId;
-        if (hier || !funk) funk = hier ? `📻 Notfall auf dieser Etage: ${e.m.titel}` : `📻 Haus-Funk: Notfall im ${welt.etagen[e.m.etage].def.name}: ${e.m.titel}`;
+        if (hier || !funk) funk = hier ? `📻 Notfall hier: ${e.m.titel}` : `📻 Haus-Funk: Notfall ${welt.etagen[e.m.etage].def.wo}: ${e.m.titel}`;
       }
       return funk;
     },

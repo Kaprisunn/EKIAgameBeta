@@ -22,13 +22,11 @@ Kleiderordnung (Restaurant mit Schürze). HUD mit Punkten, Haus-Funk für Notfä
 Warnweste vor der Logistik, Minispiele Timing (Teppich scannen) und Sortieren (Regal-Sicherheit), Kund:innen mit ❓ folgen kurz
 und stellen Fragen je Abteilung. Nebenfiguren mit weniger Dreiecken.
 
-### M6 – Parkplatz, Glasschiebetür & Wagen-Rallye ⬜
-(8.1, 9.3 Nr. 4, 5)
-- Dritte Ebene: Asphalt, Parkbuchten, blaue Fassade „EKIA KAISERSLAUTERN“, Pfälzerwald-Hügel, Berberitzen-Hecken, Wagenboxen.
-- Breite Glasschiebetür am Ausgang (öffnet animiert, 500 ms Sperre), Überblendung wie beim Aufzug.
-- Wagen-Rallye: 5 herumstehende Einkaufswagen in 30 Sekunden durch Berührung einsammeln (Countdown im HUD), dann in die Box.
-- Mission „Wagen rollen weg“ zieht auf den Parkplatz. ⚠️ Kofferraum-Tetris → Auswahl-Tafel statt Puzzle.
-**Spielbar:** draußen Wagen sammeln und helfen.
+### M6 – Parkplatz, Glasschiebetür & Wagen-Rallye ✅
+(8.1, 9.3 Nr. 4) Dritte Ebene „Parkplatz“ (karte.js, moebel-aussen.js): blaue Fassade „EKIA KAISERSLAUTERN“, Gehweg, Asphalt mit
+Parklinien, 20 Autos, Berberitzen-Hecken, 2 Wagenboxen, Laternen, Spielplatz. Glasschiebetür am Ausgang (öffnet, wenn man davorsteht;
+Sperre gegen Flackern). Wagen-Rallye (rallye.js): 5 Wagen in 30 s einsammeln, sie hängen sich als Kette an. Missionen „Wagen rollen weg“
+(jetzt draußen) und „Kofferraum-Tetris“ (Sortier-Minispiel). Kund:innen und ein Kollege auf dem Parkplatz.
 
 ### M7 – Multi-Blaster ⬜
 (5, 8.1)

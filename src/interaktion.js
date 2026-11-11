@@ -1,6 +1,6 @@
-// Interaktionspunkte der aktiven Etage (Treppe, Aufzug, Schranke; später Umkleide, Missionen, Kund:innen).
+// Interaktionspunkte der aktiven Ebene (Treppe, Aufzug, Glastür, Schranke, Spind, Missionen, Kund:innen, Rallye).
 // Automatische Punkte lösen beim Betreten einmal aus, alle anderen über den Aktionsknopf.
-const AUTO = { treppe: true, schranke: true };
+const AUTO = { treppe: true, schranke: true, tuer: true };
 
 export function erstelleInteraktion(handler) {
   const drin = new Set();

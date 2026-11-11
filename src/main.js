@@ -10,6 +10,7 @@ import { erstelleInteraktion } from './interaktion.js';
 import { erstelleLeute } from './npc.js';
 import { erstelleMissionen } from './missionen.js';
 import { erstelleKundenfragen } from './kundenfragen.js';
+import { erstelleRallye } from './rallye.js';
 import { erstelleEditor } from './editor.js';
 import { weste } from './minispiele.js';
 import { ABTEILUNGEN } from './daten.js';
@@ -64,8 +65,12 @@ function starte() {
       melde({ richtig: true, text: 'Weste an! Jetzt sehen dich Staplerfahrer:innen sofort. Die Schranke öffnet sich.' });
     }), () => { tafelOffen = false; });
   }
-  // Etagenwechsel mit kurzer Überblendung; die Figur landet am Ankunftspunkt der Ziel-Etage
+  // Ebenenwechsel mit kurzer Überblendung; die Figur landet am Ankunftspunkt der Ziel-Ebene.
+  // Danach kurze Sperre, damit Tür oder Treppe nicht sofort wieder auslösen (gegen Flackern).
+  let sperreBis = 0;
   function wechsleEtage(p) {
+    if (performance.now() < sperreBis) return;
+    sperreBis = performance.now() + 900;
     ui.blende(() => {
       welt.zeige(p.ziel);
       const [x, z, dreh] = p.ankunft;
@@ -83,6 +88,8 @@ function starte() {
   const interaktion = erstelleInteraktion({
     treppe: wechsleEtage,
     aufzug: (p) => { ton.ding(); wechsleEtage(p); },
+    tuer: (p) => { ton.tuer(); wechsleEtage(p); },
+    rallye: () => { if (!rallye.aktiv) rallye.starte(); },
     schranke: () => { if (!profil.weste) warnweste(); },
     spind: () => {
       tafelOffen = true;
@@ -112,6 +119,7 @@ function starte() {
   });
   const missionen = erstelleMissionen({ welt, leute, ui });
   const kundenfragen = erstelleKundenfragen({ welt, leute, ui, missionen });
+  const rallye = erstelleRallye({ welt, ui, missionen });
   // Neue Abteilung = neue Kleidung, die Warnweste muss dann neu angelegt werden
   erstelleEditor(document.getElementById('editor'), profil, (feld) => {
     if (feld === 'abteilung') profil.weste = false;
@@ -146,6 +154,7 @@ function starte() {
     profil: (p) => { Object.assign(profil, p); kleiden(false); },
     weste: warnweste,
     fragende: () => leute.fragende(welt.etage.id).length,
+    rallye: () => rallye.starte(),
     pos: () => [Math.round(spieler.pos.x * 10) / 10, Math.round(spieler.pos.z * 10) / 10],
     mission: (id) => missionen.starte(id, shirt(), missionFertig) && (tafelOffen = true),
   };
@@ -175,11 +184,13 @@ function starte() {
         leute.update(dt, welt.etage.id, spieler.pos);
         leute.schiebeSpieler(spieler.pos);
         kundenfragen.update(dt, welt.etage.id);
+        rallye.update(dt, welt.etage.id, spieler.pos);
         welt.update(dt, spieler.pos, profil.weste ? 'logistik' : 'ohneWeste');
         const funk = missionen.update(dt, welt.etage.id);
         if (z === Z.SPIEL) {
           ui.aktion(tafelOffen ? null : interaktion.update(welt.etage.punkte, spieler.pos));
-          ui.funk(funk);
+          ui.funk(rallye.aktiv ? rallye.text : funk, rallye.aktiv);
+          if (rallye.aktiv) hud();
         }
         kam.folge(spieler.pos, spieler.tempo, dt);
         welt.folgeSonne(spieler.pos);

@@ -1,6 +1,6 @@
 // Lern-Missionen als reine Daten (Ampel-System aus SPIEL.md 8.3). Beispieltexte: bitte vom Team prüfen lassen.
 // art:   rot = Notfall (gilt für alle Shirts), gelb = Kollegenhilfe, gruen = Aufgabe
-// zone:  verkauf = gelbes Shirt, logistik = blaues Shirt (Lager und Restaurant), buero = beide Farben
+// zone:  verkauf = gelbes Shirt, logistik = blaues Shirt (Lager und Restaurant), buero und aussen = beide Farben
 // ort:   [x, z, blickrichtung] der Person bzw. Gefahrenstelle; knopf = anderer Interaktionspunkt
 // person: 'kunde' oder 'kollege' (rolle bestimmt die Kleidung), gefahr: 'pfuetze' oder 'karton'
 // typ:   auswahl (3 Antworten, Standard), timing (im richtigen Moment scannen), sortieren (Kartons tauschen)
@@ -100,9 +100,9 @@ export const MISSIONEN = [
     tipp: 'Wer ist in Gefahr, solange der Karton dort hängt?',
   },
   {
-    id: 'wagen', art: 'rot', etage: 'eg', ort: [5, 20.2], knopf: [5, 18.6], hoehe: 2.5,
-    titel: 'Wagen rollen weg!', bereich: 'Ausgang',
-    text: 'Eine Reihe Einkaufswagen rollt am Ausgang Richtung Fahrbahn.',
+    id: 'wagen', art: 'rot', etage: 'pp', ort: [26, 19.5], knopf: [26, 17.8], hoehe: 2.5,
+    titel: 'Wagen rollen weg!', bereich: 'Parkplatz',
+    text: 'Eine Reihe Einkaufswagen rollt über den Parkplatz Richtung Fahrbahn.',
     frage: 'Was tust du?',
     antworten: ['Die Reihe sicher am Griff stoppen und in der Wagenbox sichern.', 'Hinterherrufen und hoffen, dass jemand sie aufhält.', 'Ausweichen, das ist Aufgabe der Logistik.'],
     richtig: 0,
@@ -110,11 +110,20 @@ export const MISSIONEN = [
     tipp: 'Wo stehen Einkaufswagen sicher und rollen nicht weg?',
   },
   {
-    id: 'diebstahl', art: 'gruen', zone: 'verkauf', etage: 'eg', person: 'kunde', ort: [12, 17.6, 0], typ: 'timing',
+    id: 'diebstahl', art: 'gruen', zone: 'verkauf', etage: 'eg', person: 'kunde', ort: [10.2, 17.4, 0], typ: 'timing',
     titel: 'Teppich unterm Wagen', bereich: 'Kasse / Ausgang',
     text: 'Ein Kunde schiebt seinen Wagen zum Ausgang. Unten im Wagen liegt ein Teppich, der nicht gescannt wurde.',
     frage: 'Tippe auf „Scannen!“ (oder Leertaste), wenn der rote Laser im grünen Feld steht.',
     warum: 'Freundlich ansprechen und nachscannen statt beschuldigen: Oft ist es nur ein Versehen, und die Ware wird bezahlt.',
     tipp: 'Warte, bis der Laser genau im grünen Feld steht.',
+  },
+  {
+    id: 'kofferraum', art: 'gruen', zone: 'aussen', etage: 'pp', person: 'kunde', ort: [-1.5, 14.6, Math.PI], typ: 'sortieren',
+    titel: 'Kofferraum-Tetris', bereich: 'Parkplatz',
+    text: 'Ein Kunde bekommt seine Pakete nicht sicher ins Auto.',
+    frage: 'Hilf beim Packen: Tippe zwei Pakete an, um sie zu tauschen. Schwer und flach nach unten, leicht nach oben!',
+    kisten: [['Kissen', 2], ['Regal-Paket', 22], ['Lampe', 4], ['Kommoden-Paket', 30]], oben: '⬆ oben im Kofferraum', unten: '⬇ Kofferraumboden',
+    warum: 'Schwere, flache Pakete liegen unten sicher und rutschen beim Bremsen nicht. Leichtes oben wird nicht zerdrückt.',
+    tipp: 'Das schwerste Paket gehört ganz nach unten.',
   },
 ];

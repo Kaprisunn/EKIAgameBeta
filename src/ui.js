@@ -93,8 +93,10 @@ export function erstelleUI({ start, weiter, pause, aktion, zuruecksetzen }) {
       symbol.textContent = '👕';
       el.hud.replaceChildren(symbol, ` ${abteilung} · ${def.kurz}   ⭐ ${punkte}   ✔ ${erledigt}/${gesamt}`);
     },
-    funk(text) {
+    // Funk-Streifen oben: rot für Notfälle, blau für die Wagen-Rallye
+    funk(text, blau = false) {
       el.funk.hidden = !text;
+      el.funk.classList.toggle('blau', blau);
       if (text && el.funk.textContent !== text) el.funk.textContent = text;
     },
     // Aktionsknopf zeigt, was in der Nähe möglich ist (sonst Winken)
@@ -103,7 +105,7 @@ export function erstelleUI({ start, weiter, pause, aktion, zuruecksetzen }) {
       if (art === aktionArt) return;
       aktionArt = art;
       const [symbol, text] = !p ? ['👋', ''] : p.art === 'aufzug' ? [p.ziel === 'og' ? '⬆️' : '⬇️', 'Aufzug']
-        : p.art === 'spind' ? ['👕', 'Umkleide'] : p.art === 'kunde' ? ['❓', 'Helfen'] : p.art === 'mission' ? AKTION[p.farbe] : ['❗', ''];
+        : p.art === 'spind' ? ['👕', 'Umkleide'] : p.art === 'kunde' ? ['❓', 'Helfen'] : p.art === 'rallye' ? ['🛒', 'Rallye'] : p.art === 'mission' ? AKTION[p.farbe] : ['❗', ''];
       el.aktion.textContent = symbol;
       el.aktion.setAttribute('aria-label', text || 'Winken');
       el.aktionText.textContent = text;
