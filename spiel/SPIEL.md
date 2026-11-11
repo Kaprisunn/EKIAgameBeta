@@ -171,3 +171,44 @@ Ein Lern- und Trainingsspiel für Mitarbeiter:innen. Das Haus heißt **EKIA Kais
 - 🔶 Reihenfolge: erst Missionen, dann Figur 2.0 und Charakter-Editor.
 - 🔶 Hauptmissionen = Lernmissionen der eigenen Rolle an leuchtenden Zielpunkten (feste Reihenfolge).
   Nebenmissionen = kurze Aufgaben zwischendurch: Kundenfragen, Kolleg:innen um Hilfe bitten, Fundstücke sammeln.
+
+---
+
+## 8. TEIL 3: AMPEL-MISSIONEN, KLEIDERORDNUNG, PARKPLATZ (mit Gemini erarbeitet, November 2026)
+
+### 8.1 Drei Ebenen
+Obergeschoss (Showroom, Restaurant, Großraumbüro), Erdgeschoss (Markthalle, Fundgrube, Kasse, Kundenservice, Logistik/SB-Halle)
+und Parkplatz. Es wird nur die aktive Ebene gezeichnet. Vom Erdgeschoss führt unten eine breite Glasschiebetür (500 ms Sperre
+gegen Flackern) auf den Parkplatz vor der blauen Fassade „EKIA KAISERSLAUTERN“ mit Pfälzerwald-Hügeln.
+Parkplatz: herrenlose Einkaufswagen als Kette einsammeln, beim Kofferraum-Tetris helfen, EKIA-Multi-Blaster
+(Barcode-Laser, Hotdog-/Köttbullar-Kanone) macht grummelige Kunden-Wellen glücklich.
+🔶 Offen: Blaster sofort aktiv oder per Station am Einkaufswagen-Häuschen (Vorschlag: Station).
+
+### 8.2 Kleiderordnung & Spinde
+- Verkauf oben/unten, Kasse, Kundenservice, Fundgrube: gelbes Shirt (#FBD914). Logistik/SB-Halle und Restaurant: blaues Shirt (#0058AB),
+  Restaurant mit Schürze. Großraumbüro: gemischt, neutrale Zone.
+- Umziehen im Startmenü und an grauen Schnellwechsel-Spinden auf jeder Etage (EG nahe SB-Halle/Logistik, OG in der Umkleide), Taste U oder Knopf.
+  Kurzer Farb-Wirbel (Sternchen-Kreis) zeigt den Wechsel.
+
+### 8.3 Ampel-Missionssystem (10 Lernfälle, Inhalte in src/lerninhalte.js)
+- 🔴 Rot (!): Notfall, gilt für alle Shirts. Rutschgefahr, schiefer Karton im Hochregal, wegrollende Einkaufswagen.
+- 🟡 Gelb (Handschlag): Kollegenhilfe, braucht das passende Shirt. Schwerer Karton (zu zweit heben), Kassen-Stau koordinieren (Büro),
+  Transportproblem (Umklapp-Trick, Lieferservice, Miettransporter).
+- 🟢 Grün (Häkchen): Aufgabe, braucht das passende Shirt. Preisschild (Maße, Gang/Fach), Mehrpaket „1 von 2“, Paletten-Sicherheit,
+  Frische-Taktung im Restaurant.
+- Prüfreihenfolge: erst „Notfall?“, dann die Shirt-Farbe. Falsche Farbe: freundlicher Hinweis zum Spind.
+- Multiple Choice A/B/C. Richtig: Punkte und Erklärung „warum“. Falsch: kein Game Over, sondern Denk-Tipp; danach halbe Punkte.
+
+### 8.4 Oberfläche
+HUD oben links (Shirt-Farbe, Etage, Punkte, erledigte Missionen), Haus-Funk oben mittig bei offenen Notfällen.
+
+### 8.5 Charakter-Auswahl (12 Profile)
+Herkunft (dunkelhäutig, asiatisch, europäisch) × Geschlecht (männlich, weiblich) × Alter (jung 20–30, erfahren 60+ mit
+schneeweißem Haar, Männer mit weißem Vollbart). Alle gleich schnell und stark.
+
+### 8.6 Abweichungen und Annahmen
+- Gemini schlägt 2D-Canvas-Grafik vor; das Spiel bleibt 3D mit Three.js (CLAUDE.md). Shirt-Wechsel baut die 3D-Figur neu.
+- Charakter-Porträt im HUD vorerst als Shirt-Symbol in Shirt-Farbe. 🔶
+- Die Mission „Wagen rollen weg“ liegt bis zum Parkplatz am Ausgang im Erdgeschoss. 🔶
+- Symbole sind über Wände hinweg sichtbar, damit man sie findet. Es sind alle 10 Missionen gleichzeitig aktiv. 🔶
+- Die Logistik-Schranke öffnet sich mit dem blauen Shirt (früher: Rolle Logistik).

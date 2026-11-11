@@ -35,6 +35,7 @@ export function baueFigur(s) {
     [() => zylinder(0.36, 0.34, 0.34, 12), s.hose, [0, 0.06, 0]],
     [() => kapsel(0.4, 0.36, 12), s.shirt, [0, 0.5, 0]],
     ...(s.schild ? [[() => quader(0.17, 0.11, 0.05), s.schild, [-0.16, 0.66, 0.36], [0, -0.35, 0], [1, 1, 1], false]] : []),
+    ...(s.schuerze ? [[() => quader(0.6, 0.62, 0.05), 0xf4f4f4, [0, 0.24, 0.42], [0, 0, 0], [1, 1, 1], false]] : []),
   ], opt));
 
   // Augen: weiße abgeflachte Kugel, dunkle Pupille, kleiner Glanzpunkt (y = Höhe über der Kopfmitte)

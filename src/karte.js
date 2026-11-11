@@ -25,7 +25,7 @@ export const ETAGEN = {
       ['palette', 29, -10], ['palette', 29, -6.5], ['palette', 29.5, 3],
       ['rollwagen', 22.5, 2], ['rollwagen', 23.8, 2], ['rollwagen', 30.5, -14],
       // Click & Collect: Theke vor dem offenen Lagertor
-      ['ccTheke', 26, 11.5], ['torOffen', 26.5, 8],
+      ['ccTheke', 26, 11.5], ['torOffen', 26.5, 8], ['spindklein', 18.7, -12.5],
       // Fundgrube, Kassen, Ausgang
       ['fundgrube', 10, -4],
       ...[-2, 2, 6, 10, 14].map((x) => ['kasse', x, 12]), ...[-2, 6, 14].map((x) => ['absperrung', x, 8.4, R]),
@@ -56,11 +56,13 @@ export const ETAGEN = {
       ['Click & Collect', 26, 3.75, 13, 0.75, 'blau', 0.45, 0, true],
       ['Kundenservice · Warenausgabe', 26, 2.95, 13.05, 0.4, 'weiss', 0.45],
       ['Lager · Warenausgabe', 26.5, 3.6, 8.3, 0.4, 'warn'],
+      ['👕 Spind', 18.7, 2.4, -12.2, 0.4, 'weiss'],
     ],
     punkte: [
       { art: 'treppe', x: TREPPE, z: 13.7, r: 1.2, ziel: 'og', ankunft: [TREPPE, 5.4, Math.PI] },
       { art: 'aufzug', x: AUFZUG, z: 11.3, r: 1.7, ziel: 'og', ankunft: [AUFZUG, 11.6, 0] },
       { art: 'schranke', x: 18.4, z: -3.3, r: 2.2 },
+      { art: 'spind', x: 18.7, z: -11.2, r: 1.6 },
     ],
     pfeile: [[-27.5, 16.5], [-19.5, 15], [-19, -7], [-15, -11.2], [14, -11.2], [17, -8], [17, 4], [8, 6.5], [8, 15.5], [12, 20.8]],
   },
@@ -88,13 +90,14 @@ export const ETAGEN = {
       ['Obergeschoss', -16, 3.4, 4, 0.7, 'blau', 0.45, 0, true],
       ['Umkleide', -18, 2.65, 13.25, 0.45, 'weiss', 0.3],
       ['Großraumbüro', 13, 2.65, 13.25, 0.45, 'weiss', 0.3],
+      ['👕 Spind', -12.8, 2.35, 13.75, 0.4, 'weiss'],
       ['Treppe zum Erdgeschoss', TREPPE, 3.2, 14.6, 0.5, 'weiss', 0.4, 0, true],
       ['Aufzug', AUFZUG, 3.75, 10.08, 0.45, 'weiss'],
     ],
     punkte: [
       { art: 'treppe', x: TREPPE, z: 7.9, r: 1.2, ziel: 'eg', ankunft: [TREPPE, 15.6, 0] },
       { art: 'aufzug', x: AUFZUG, z: 11.3, r: 1.7, ziel: 'eg', ankunft: [AUFZUG, 11.6, 0] },
-      { art: 'umkleide', x: -15, z: 17, r: 2.2 },
+      { art: 'spind', x: -12.8, z: 14.9, r: 1.6 },
     ],
     pfeile: [[-29.4, 4], [-24, -11], [4, -12], [10, -4], [8, 8], [-6, 9], [-20, 6]],
   },

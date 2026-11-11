@@ -35,6 +35,9 @@ function piep(frequenz, dauer, { typ = 'sine', laut = 0.2, ende = frequenz, star
 
 export const ton = {
   klick() { piep(660, 0.08, { ende: 880, laut: 0.15 }); },
+  wechsel() { [660, 880, 1175].forEach((f, i) => piep(f, 0.12, { typ: 'triangle', laut: 0.12, start: i * 0.06 })); },
+  richtig() { piep(784, 0.14, { laut: 0.16 }); piep(1046, 0.25, { laut: 0.16, start: 0.12 }); },
+  falsch() { piep(330, 0.25, { typ: 'triangle', laut: 0.14, ende: 260 }); },
   ding() { piep(1046, 0.6, { laut: 0.16 }); piep(784, 0.9, { laut: 0.14, start: 0.18 }); },
   winken() { piep(520, 0.12, { typ: 'triangle', ende: 700 }); piep(700, 0.16, { typ: 'triangle', ende: 900, start: 0.13 }); },
   schritt() {

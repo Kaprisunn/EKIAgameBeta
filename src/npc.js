@@ -7,6 +7,7 @@ import { neueAnimation, animiere, starteWinken } from './animation.js';
 import { material, teil, quader } from './formen.js';
 import { FARBE } from './daten.js';
 import { LEUTE, SPRUECHE } from './leute.js';
+import { MISSIONEN } from './lerninhalte.js';
 
 const zufall = (l) => l[Math.floor(Math.random() * l.length)];
 const HAUT = [0xf5d0b5, 0xf2c29b, 0xe8b48c, 0xc68a5e, 0x9b6a43, 0x6e4a2f];
@@ -17,12 +18,13 @@ const HOSEN = [0x4a5a78, 0x3a3f47, 0x8c7a5b, 0x2b3550];
 const RADIUS = 0.4, ABSTAND = 0.95, BLASE_ZEIT = 2.8;
 const FLECK = new THREE.MeshBasicMaterial({ color: 0x1f2a36, transparent: true, opacity: 0.2, depthWrite: false });
 
+// Kleiderordnung: Verkauf gelb, Logistik und Restaurant blau (Restaurant mit Schürze), Büro gemischt
 function steckbrief(kollege, rolle) {
-  const shirt = kollege ? zufall([FARBE.gelb, FARBE.blau]) : zufall(OBERTEILE);
+  const shirt = !kollege ? zufall(OBERTEILE) : rolle === 'verkauf' ? FARBE.gelb : rolle === 'buero' ? zufall([FARBE.gelb, FARBE.blau]) : FARBE.blau;
   return {
     haut: zufall(HAUT), haare: zufall(HAARE), frisur: zufall(FRISUREN), shirt, schuhe: FARBE.umriss,
     hose: kollege ? (rolle === 'logistik' ? 0x1e2f55 : 0x2b2b30) : zufall(HOSEN),
-    schild: kollege ? (shirt === FARBE.gelb ? FARBE.blau : FARBE.gelb) : null,
+    schild: kollege ? (shirt === FARBE.gelb ? FARBE.blau : FARBE.gelb) : null, schuerze: kollege && rolle === 'gastro',
     tasche: !kollege && Math.random() < 0.5 ? zufall([FARBE.gelb, FARBE.blau]) : null,
     groesse: 0.9 + Math.random() * 0.14, umriss: false, einfach: true,
   };
@@ -46,7 +48,7 @@ function sitzen(n) {
 }
 
 export function erstelleLeute(welt) {
-  const etagen = {};
+  const etagen = {}, missionsLeute = {};
   for (const [id, d] of Object.entries(LEUTE)) {
     const gruppe = welt.etagen[id].gruppe, liste = [];
     for (let i = 0; i < d.kunden; i++) {
@@ -65,6 +67,14 @@ export function erstelleLeute(welt) {
       n.kiste = new THREE.Mesh(teil(quader(0.62, 0.45, 0.5), FARBE.karton), material('bunt'));
       n.kiste.position.set(0, 0.45, 0.55);
       n.f.koerper.add(n.kiste);
+      liste.push(n);
+    }
+    // Personen der Lern-Missionen (lerninhalte.js): Kund:innen warten, bis ihnen geholfen ist
+    for (const mi of MISSIONEN.filter((x) => x.etage === id && x.person)) {
+      const [x, z, dreh] = mi.ort, n = person(gruppe, mi.person, x, z, dreh, mi.rolle);
+      if (n.typ === 'kunde') { n.steht = true; n.ziel = zufall(d.wege); }
+      n.mission = mi.id;
+      missionsLeute[mi.id] = n;
       liste.push(n);
     }
     const flecken = new THREE.InstancedMesh(new THREE.CircleGeometry(0.5, 14).rotateX(-Math.PI / 2), FLECK, liste.length);
@@ -123,7 +133,7 @@ export function erstelleLeute(welt) {
       if (!e) return;
       aktiv = e;
       e.liste.forEach((n, i) => {
-        const v = n.typ === 'kollege' ? 0 : bewege(n, dt, e.d, spieler);
+        const v = n.typ === 'kollege' || n.steht ? 0 : bewege(n, dt, e.d, spieler);
         let dd = n.dreh - n.f.wurzel.rotation.y;
         dd = Math.atan2(Math.sin(dd), Math.cos(dd));
         n.f.wurzel.rotation.y += dd * (1 - Math.exp(-8 * dt));
@@ -148,7 +158,7 @@ export function erstelleLeute(welt) {
         let beste = null, bd = 2.8;
         for (const n of e.liste) {
           const abst = Math.hypot(n.pos.x - spieler.x, n.pos.z - spieler.z);
-          if (abst < bd && n.blaseIn <= 0) { bd = abst; beste = n; }
+          if (abst < bd && n.blaseIn <= 0 && !n.mission) { bd = abst; beste = n; }
         }
         if (beste) {
           beste.blaseIn = 20;
@@ -158,10 +168,11 @@ export function erstelleLeute(welt) {
         }
       }
     },
-    // Stehende und sitzende Kolleg:innen sind feste Hindernisse für den Spieler
+    missionsPerson: (id) => missionsLeute[id] ?? null,
+    // Stehende und sitzende Personen sind feste Hindernisse für den Spieler
     schiebeSpieler(p) {
       for (const n of aktiv?.liste ?? []) {
-        if (n.typ !== 'kollege') continue;
+        if (n.typ !== 'kollege' && !n.steht) continue;
         const dx = p.x - n.pos.x, dz = p.z - n.pos.z, d = Math.hypot(dx, dz);
         if (d < ABSTAND && d > 1e-4) { p.x += (dx / d) * (ABSTAND - d); p.z += (dz / d) * (ABSTAND - d); }
       }
